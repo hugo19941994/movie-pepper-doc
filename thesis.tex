@@ -496,12 +496,12 @@ Para cada conjunto de documentos filtrados se hace el \acrshort{tfidf}\index{TF-
     \caption{Ejemplo matriz \acrshort{tfidf}\index{TF-IDF}}
 \end{figure}
 
-Esto crea una matriz por cada documentos del corpus. Cada casilla corresponde a una palabra del vocabulario y su valor es la relevancia de esa palabra en ese documento. Si fuese necesario, en este paso se pueden extraer los tokens más relevantes de cada documento para su posterior uso. Cuando se ejecute \acrshort{svd}\index{SVD} se perderán esos datos. Para el recomendador no va a ser necesario guardar esta información.
+Esto crea una matriz donde cada fila corresponde a un documento del corpus, mientras que las columnas representan las palabras del vocabulario. Cada casilla corresponde a la relavancia de esa palabra en ese documento. En nuestro caso guardamos cada fila en el \acrshort{json} de la películas correspondiente. Si fuese necesario, en este paso se pueden extraer los tokens más relevantes de cada documento para su posterior uso. Cuando se ejecute \acrshort{svd}\index{SVD} se perderán esos datos, pero para el recomendador no va a ser necesario guardarlos.
 
 El código para realizar la matriz \acrshort{tfidf} se basa en la implementación de scikit-learn\cite{scikit-learn}
 
 \section{Descomposición en valores singulares}
-Con \acrfull{svd}\index{SVD} reducimos la dimensionalidad de las matrices calculadas con \acrshort{tfidf}\index{TF-IDF}. Esto acelera de una manera muy significativa los cálculos y además soluciona el problema de la polisemia. Existen varias formas de calcular el \acrshort{svd}\index{SVD}, pero scikit-learn implementa el algoritmo descrito en \citetitle{2009arXiv0909.4061H}
+Con \acrfull{svd}\index{SVD} reducimos la dimensionalidad de la matriz calculada con \acrshort{tfidf}\index{TF-IDF}. Esto acelera de una manera muy significativa los cálculos y además soluciona el problema de la polisemia. Existen varias formas de calcular el \acrshort{svd}\index{SVD}, pero scikit-learn implementa el algoritmo descrito en \citetitle{2009arXiv0909.4061H}
 
 \acrshort{svd}\index{SVD} busca descomponer una matriz natural en 3 matrices diferentes diferentes. A representa la matriz de documentos donde cada file representa los diferentes términos y las columnas representan los diferentes documentos.\cite{stanford-svd}
 
@@ -756,7 +756,7 @@ El objetivo del modelo \acrshort{cbow} es predecir la posibilidad de que una pal
     \begin{subfigure}[t]{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{figures/fig-skip-gram.pdf}
-        \caption{Modelo skip-gram de Word2Vec\cite{DBLP:journals/corr/Rong14}\index{Word2Vec}}\label{skip-gram}
+        \caption{Modelo Skip-Gram de Word2Vec\cite{DBLP:journals/corr/Rong14}\index{Word2Vec}}\label{skip-gram}
     \end{subfigure}
     \caption{Modelos Word2Vec\index{Word2Vec}}
 \end{figure}
@@ -837,7 +837,7 @@ En el output habrá tantos vectores como hayamos configurado en nuestra ventana 
 
 \begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.6\textwidth]{./figures/skip-gram-exp.png}
+    \includegraphics[width=0.8\textwidth]{./figures/skip-gram-exp.png}
     \caption{Representación visual del modelo Skip-Gram\cite{skip-gram-exp}}\label{skip-gram-exp}
 \end{figure}
 
@@ -1033,16 +1033,16 @@ Se decidió optimizar el modelo usando películas películas que, a mi parecer, 
 
 En las gráficas todos los puntos se han movido lateralmente unos milímetros para que no se solapen en el caso de que su posición sea la misma.
 
-Las líneas en las gráficas se han extraído usando una regresión lineal simple para poder ver la tendencia de los modelos más fácilmente.
+Las líneas en las gráficas se han generado usando una regresión lineal simple para poder ver la tendencia de los modelos más fácilmente.
 
 \section{LSA}
 En el modelo \acrshort{lsa}\index{LSA} se pueden ajustar cuatro parámetros.
 
 \begin{itemize}
-    \item Minimum Document Frequency: El mínimo número de veces que una palabra debe aparecer en nuestro corpus de documentos para ser usado en el calculo de \acrshort{tfidf}\index{TF-IDF}.
+    \item Minimum Document Frequency: El mínimo número de veces que una palabra debe aparecer en el corpus de documentos para ser usado en el calculo de \acrshort{tfidf}\index{TF-IDF}.
     \item Maximum Document Frequency: Igual que el parámetro anterior, pero para el máximo número de veces que debe aparecer una palabra.
-    \item Número de Componentes: Con cuantos componentes de \acrshort{tfidf}\index{TF-IDF} quedarnos.
-    \item Número de features: Al número de componentes al que reducir nuestros componentes usando \acrshort{lsa}\index{LSA}
+    \item Número de Componentes: Máximo número de componentes (palabras) en la matriz de \acrshort{tfidf}\index{TF-IDF}. Las palabras menos relevantes se descartán si superan este número.
+    \item Número de features: Al número de componentes al que reducir los componentes usando \acrshort{lsa}\index{LSA}
 \end{itemize}
 
 Los parámetros elegidos han sido maximum document frequency 200, minimum document frequency 5, número de componentes 1000 y número de features sin límite.
