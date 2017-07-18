@@ -1,0 +1,1425 @@
+\documentclass[withindex, glossary]{cam-thesis}
+\pdfminorversion=7
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[table]{xcolor}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage{cleveref}
+
+\usepackage{hyperref}
+\addto\extrasspanish{%
+    \def\chapterautorefname{capítulo}%
+}
+
+\usepackage{svg}
+\usepackage{multicol}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{bookmark}
+\usepackage{blkarray, bigstrut}
+\usepackage{subcaption}
+\usepackage{pgfgantt}
+\usepackage{array}
+\usepackage[capposition=top]{floatrow}
+
+\usepackage[backend=biber, style=ieee, sorting=ynt]{biblatex}
+\addbibresource{thesis.bib}
+
+\usepackage{minted}
+\usemintedstyle{manni}
+
+\usepackage{csquotes}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, fit, backgrounds, positioning, matrix, decorations.pathreplacing, calc}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!50]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!20]
+\tikzstyle{database} = [cylinder, minimum width=3cm, minimum height=2cm, text centered, shape border rotate=90, aspect=0.25, draw=black, fill=yellow!30]
+\tikzstyle{arrow} = [thick, ->, >=stealth]
+\tikzstyle{line} = [-Latex]
+\newcommand{\inline}[2]{%
+    \begin{tikzpicture}[baseline=(word.base), txt/.style={shape=rectangle, inner sep=0pt}]
+        \node[txt] (word) {\texttt{#1}};
+        \node[above] at (word.north) {\footnotesize{#2}};
+    \end{tikzpicture}%
+}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+
+\setlength{\columnseprule}{0.4pt}
+
+\title{Estudio sobre Sistemas de Recomendación y Predicción basados en el procesamiento del lenguaje natural}
+\author{Hugo Ferrando Seage}
+\college{Escuela de Arquitectura, Ingeniería y Diseño}
+\submissiondate{julio 2017\\Director: Dr.\ Esteban García-Cuesta}
+\date{October 2016}
+\fecha{octubre 2016}
+
+% PDF meta-info
+\subjectline{Ingeniería Informática}
+% max 6
+\keywords{lenguaje natural películas recomendación inteligencia artificial}
+
+% Abstract
+\espabstract{%
+    Debido a la gran cantidad de contenidos ofrecidos por las plataformas de \acrfull{vod} es necesario ofrecer a los usuarios un sistema de recomendación que tenga en cuenta sus gustos para ofrecer una buena usabilidad.
+
+    Existen varias técnicas para tal fin como el filtrado colaborativo o el filtrado por contenido, pero tradicionalmente ha sido necesario tener descriptores de las películas, como sus géneros, o una buena cantidad de puntuaciones numéricas de muchos usuarios diferentes.
+
+    Gracias a los avances en las técnicas del procesamiento del lenguaje natural quiero explorar la posibilidad de construir un recomendador que se base solamente en críticas escritas por diferentes usuarios. Además pensamos que es posible construir un modelo colaborativo que se base en descriptores sacados de esas críticas en vez de puntuaciones.
+}
+
+\abstract{%
+    Due to the amount of content offered by Video-On-Demand platforms, it's necessary to offer users a powerful recommendation system capable of taking into account their tastes to offer good usability.
+
+    There are several techniques used to achieve this, such as content or collaborative filtering, though traditionally, it's been necessary to use film features, such as their genres or a good amount of numerical scores by several different users.
+
+    Thanks to the advancements in the natural language processing techniques, it's now possible to build such a system using only film reviews written by users. In addition, we think it's possible to not only build a content filtering based model, but a collaborative filtering one, using the different features extracted in the natural language processing.
+}
+
+% Acknowledgements
+\acknowledgements{%
+    Quiero dar gracias a mis padres por todas las oportunidades que me han brindado. Sin ellos no podría haber llegado hasta aquí.
+
+    También quiero mencionar a mis compañeros del practicum y a todos los miembros del Big Data Lab de la Universidad Europea de Madrid.
+}
+
+% Glossary
+\newglossaryentry{one-hot}{%
+    name=one-hot,
+    description={Vector donde todos los elementos son 0 exceptuando una posición con un 1}
+}
+\newglossaryentry{testing-ab}{%
+    name=testing A/B,
+    description={Método para evaluar un cambio en un sistema, como puede ser un cambio en un algoritmo de recomendación, a una parte de los usuarios. Después de un plazo se miden los cambio en el comportamiento de los usuarios}
+}
+\newglossaryentry{mongodb}{%
+    name=MongoDB,
+    description={Base de datos no relacional basada en archivos \acrshort{json}}
+}
+\newglossaryentry{groundtruth}{%
+    name=Ground Truth,
+    description={Datos con los que comparar un modelo para estimar su efectividad}
+}
+\newglossaryentry{softmax}{%
+    name=Softmax,
+    description={Función logística que transforma los valores de un vector de numero reales a valores en el rango [0, 1]. La suma de todas los valores debe ser igual a 1 (distribución de probabilidad)}
+}
+\newglossaryentry{word-embedding}{%
+    name=Word Embedding,
+    description={Técnicas de procesamiento de lenguaje natural donde cada palabra del vocabulario es transformada en un vector de valores reales}
+}
+
+% Acronyms
+\newacronym{vod}{VOD}{Video On Demand}
+\newacronym{mvp}{MVP}{Minimum Viable Product}
+\newacronym{api}{API}{Application Programming Interface}
+\newacronym{rest}{REST}{Representational state transfer}
+\newacronym{svd}{SVD}{Singular Value Decomposition}
+\newacronym{lsa}{LSA}{Latent Semantic Analysis}
+\newacronym{tfidf}{TF-IDF}{Term Frequency-Inverse Document Frequency}
+\newacronym{json}{JSON}{Javascript Object Notation}
+\newacronym{cbow}{CBOW}{Continous Bag of Words}
+\newacronym{als}{ALS}{Alternating Least Squares}
+\newacronym{spa}{SPA}{Single Page Application}
+\newacronym{ssr}{SSR}{Server-Side Rendering}
+\newacronym{lda}{LDA}{Latent Dirichlet Allocation}
+\newacronym{es6}{ES6}{ECMAScript 6}
+
+% Contents
+\begin{document}
+\frontmatter{}
+
+% Thesis body:
+\chapter{Introducción}
+\section{¿Qué es un sistema de recomendación?}
+Un sistema de recomendación es cualquier software capaz de recomendar un producto o servicio a un usuario en particular en base a algún criterio, generalmente del propio producto, usuario o alguna combinación de ambos.
+
+Los sistemas de recomendación se pueden aplicar a una multitud de ámbitos: \textbf{películas}, series de TV, libros, restaurantes, hoteles, búsquedas online, seguros, sistemas expertos\cite{DBLP:journals/corr/ChenOG15}, servicios financieros\cite{Felfernig:2007:VFS:1620113.1620117}, etc.\
+
+El software debe ser capaz de hacer un ranking de los diferentes ítems a recomendar y ofrecerlos al usuario. Si las recomendaciones son buenas ayudan en la navegación y el descubrimiento del producto y aumentan la satisfacción del cliente.
+
+A continuación se describen las dos grandes categorías en las que se dividen.
+
+\section{Filtrado Colaborativo}
+El filtrado colaborativo trata de emparejar usuarios con gustos similares para después hacer recomendaciones. Los tres pilares son (1) deben participar muchas personas, (2) los usuarios deben representar sus gustos de alguna manera y (3) los algoritmos deben poder encontrar personas con gustos parecidos.\cite{TerveenHill2001}
+
+Dentro de estos sistemas existen tres tipos:
+
+\begin{itemize}
+    \item Basados en memoria
+    \item Basados en modelo
+    \item Híbridos
+\end{itemize}
+
+Los basados en memoria usan datos de evaluación de los usuarios (como una puntuación numérica) y calcula la similitud entre usuarios usando algoritmos como \textit{Nearest Neighbour}.
+
+Los basados en modelo usan algoritmos de aprendizaje automático y pueden usar tipos de datos más diversos que los basados en memoria. Los algoritmos incluyen redes bayesianas, \acrshort{lsa}\index{LSA}, \acrshort{svd}\index{SVD}, clustering, cadenas de markov etc. Una de las principales ventajas de estos modelos es su fácil escalabilidad\cite{sk09} y su capacidad para obtener patrones intrínsecos a los comportamientos homogéneos\cite{GARCACUESTA2011}, en este caso, asociados a los usuarios.
+
+Los híbridos usan una combinación de ambos modelos para dar mejores resultados.
+
+Servicios como Netflix\index{Netflix}, Movistar+\index{Movistar+} (figura~\ref{rec-movistar}) y Movielense (figura~\ref{rec-movielense}) usan filtrado colaborativo para hacer recomendaciones personalizadas a nivel de usuario usando diversas técnicas.
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[t]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{./figures/rec-movistar.png}
+        \caption{Recomendaciones personalizadas en Movistar+\index{Movistar+}}\label{rec-movistar}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./figures/rec-movielense.png}
+        \caption{Recomendaciones personalizadas en Movielense}\label{rec-movielense}
+    \end{subfigure}
+    \caption{Sistemas de recomendación basados en filtrado colaborativo}
+\end{figure}
+
+\section{Filtrado por contenido}
+Este tipo de filtrado relaciona los gustos de un usuario con las propiedades de un ítem sin tener en cuenta a otros usuarios.
+
+Las características de los ítems pueden ser de todo tipo. En las películas podría ser los géneros que le corresponden, en restaurantes el tipo de comida que sirven, etc
+
+Para realizar las recomendaciones los sistemas se suelen basar en acciones anteriores de un usuario para poder recomendar algo (al comprar unos neumáticos recomendar un recambio de aceite, por ejemplo), o se puede crear un modelo en base a los descriptores de los ítems usando redes neuronales, \acrshort{tfidf}\index{TF-IDF}, redes bayesianas, clusters, árboles de decisión etc.
+
+IMDb\index{IMDb} (figura~\ref{rec-imdb}) usa este tipo de sistema para hacer sus recomendaciones al visitar la página de una película.
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{./figures/rec-imdb.png}
+    \caption{Recomendaciones por película en IMDb\index{IMDb}}\label{rec-imdb}
+\end{figure}
+
+\section{Evaluación de modelos y otras consideraciones}
+La evaluación de estos modelos puede presentar algún problema, ya que no se suele contar un \textit{`\gls{groundtruth}'} contra los que evaluar la precisión del modelo. Por esto se suele evaluar de manera manual y preguntando por la satisfacción de los usuarios o usando \gls{testing-ab}\cite{Beel:2013:CAO:2532508.2532511}.
+
+Además, a la hora de recomendar, los usuarios también suelen valorar otros aspectos que el sistema de recomendación no tome en cuenta.
+
+Por ejemplo, es interesante que las recomendaciones sorprendan\cite{Onuma2009} al usuario y que sean lo suficientemente diferentes entre sí. También es interesante hacer recomendaciones diferentes teniendo en cuenta el lugar donde el usuario vive o su edad. Esto puede suponer problemas ya que el usuario se puede dar cuenta de que el sistema no respeta su privacidad.
+
+\section{Antecedentes}
+Existen varias técnicas usadas a día de hoy para recomendar películas. Varios servicios cuentan con recomendaciones por película como \href{http://www.imdb.com}{IMDb}\index{IMDb} (figura~\ref{rec-imdb}) y \href{http://ver.movistarplus.es}{Movistar+}\index{Movistar+}. Otros servicios ofrecen recomendaciones con filtrado colaborativo a cada usuario como \href{https://netflix.com}{Netflix}\index{Netflix} y \href{http://ver.movistarplus.es}{Movistar+}\index{Movistar+} (figura~\ref{rec-movistar}). Además existen servicios que se dedican exclusivamente a hacer estas recomendaciones como \href{https://movielens.org/}{Movielense} (figura~\ref{rec-movielense}), \href{http://www.jinni.com/}{Jinni} y \href{https://www.taste.io/}{Taste.io}.
+
+Muchos de estos servicios se basan en las puntuaciones o visualizaciones de los contenidos vistos por el usuario para realizar un filtrado colaborativo. Otros servicios usan tags, como los ofrecidos por IMDb\index{IMDb} y los géneros, para ver que películas tienen más cosas en común y así poder recomendarlas.
+
+En otros ámbitos se usan sistemas similares. \href{https://www.last.fm/}{Last.fm} hace recomendaciones en base a la música que escuchan sus usuarios. Twitter es capaz de recomendar varias cuentas para seguir a sus usuarios usando una combinación de muchas señales\cite{Gupta:2013:WFS:2488388.2488433}, como se puede ver en la figura~\ref{rec-twitter}.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.4\textwidth]{./figures/rec-twitter.png}
+    \caption{Recomendaciones en Twitter}\label{rec-twitter}
+\end{figure}
+
+\section{Objetivos}
+El objetivo principal es la creación de una aplicación web donde un usuario pueda escoger una película y obtenga 10 películas recomendadas usando diferentes algoritmos basados en el procesamiento de lenguaje natural.
+
+En concreto se implementarán modelos basados en \acrshort{lsa}\index{LSA} y Doc2Vec\index{Doc2Vec}, además de realizar una optimización de sus parámetros para su evaluación. También se describirá un tercer modelo híbrido llamado E-Modelo\cite{emodelo}\index{E-Modelo}, que, pese a haber completado su implementación, no se ha incluido en el recomendador.
+
+También se implementa una interfaz común donde poder hacer peticiones a los diferentes modelos usando una \acrshort{api} \acrshort{rest}, además de la interfaz web desde donde probar los algoritmos. Ésta última debe ser rápida y lo suficientemente intuitiva para que un usuario normal lo pueda usar. La \acrshort{api} \acrshort{rest} es pública y puede servir para la creación de otros servicios ajenos a este proyecto.
+
+Para la creación de modelos es necesario tener un buen conjunto de datos con los que realizar el entrenamiento. Para ello se realiza otro programa que descarga los datos necesarios de IMDb\index{IMDb} mediante un crawler.
+
+El código del proyecto está publicado en tres repositorios de GitHub (todo el código bajo licencia MIT):
+
+\begin{itemize}
+    \item \textit{Frontend} \url{https://github.com/hugo19941994/movie-pepper-back}
+    \item \textit{Backend} \url{https://github.com/hugo19941994/movie-pepper-front}
+    \item \textit{Documentación} \url{https://github.com/hugo19941994/movie-pepper-doc}
+\end{itemize}
+
+El proyecto está en producción y se puede visitar en \url{https://moviepepper.hugofs.com}.
+
+\section{Estructura}
+En primer lugar se describe la metodología seguida para el desarrollo del proyecto, mientras que los capítulos siguientes se centran en la parte mas técnica del proyecto y describen los diferentes procesos y métodos usados. Esto incluye como se consiguen los datos para el recomendador, como se filtra el texto y los algoritmos usados para la creación de los modelos.
+
+En segundo lugar se presentan unas gráficas con los resultados al variar los parámetros de los dos algoritmos implementados y unos resultados finales con los modelos finalizados.
+
+El capítulo \textit{Interfaz} habla sobre la web desde donde se pueden probar los modelos y como se ha creado.
+
+Finalmente se presentan unas conclusiones sobre el proyecto y se habla sobre partes que se podrían mejorar.
+
+\chapter{Metodología}
+La metodología de este proyecto ha sido ágil, basado en la creación de \acrshort{mvp}s. Gracias a esta metodología se pueden evaluar diferentes caminos e hipótesis posibles con una cantidad de recursos limitados. También reduce los riesgos frente a posibles fallos o experimentos.
+
+Cada iteración del proyecto constaba con unos objetivos claros y un alcance limitado. Después de su realización se lanzaban una serie de pruebas para verificar su correcto funcionamiento y se analizaban los resultados obtenidos. Si los resultados no fueron satisfactorios se descartaba esta iteración y se realizaba alguna modificación para poder ir mejorando.
+
+En primer lugar realizamos la fase de recolección de datos. Se probaron tres sitios diferentes: Wikipedia\index{Wikipedia}, IMDb\cite{imdb}\index{IMDb} y FilmAffinity\index{FilmAffinity}. En Wikipedia\index{Wikipedia} es demasiado difícil sacar la información de las diferentes películas manera precisa. Tanto FilmAffinity como IMDb\cite{imdb}\index{IMDb} tienen contenidos más estructurados. FilmAffinity\index{FilmAffinity} tiene tags de género más precisos, pero IMDb\cite{imdb}\index{IMDb} cuenta con muchos más usuarios y por lo tanto más variedad de tags y de críticas.
+
+Se empezó usando una combinación de las 3 fuentes, pero tras hacer pruebas se vio que con los datos de IMDb\cite{imdb}\index{IMDb} era suficiente y simplificaba el código.
+
+También se usó \Gls{mongodb} para guardar toda la información, pero finalmente se descartó por el mismo motivo de arriba. Complicaba el código y en este proyecto no aportaba muchos beneficios, sobre todo al eliminar la información de FilmAffinity\index{FilmAffinity} y Wikipedia\index{Wikipedia}.
+
+Como orden de implementación se realizó primero el modelo \acrshort{lsa}\index{LSA} y en paralelo se realizó el proyecto de E-Modelo\cite{emodelo}\index{E-Modelo}. Debido a las resultados del E-Modelo\index{E-Modelo} se decidió reemplazarlo con Doc2Vec\index{Doc2Vec}.
+
+Cuando todos los modelos fueron optimizados y evaluados se realizó la interfaz web, el \acrshort{api} \acrshort{rest} y este documento.
+
+Hay que mencionar que la inspiración para este proyecto fue la realización de tareas de mejora e investigación en un motor de recomendación de películas al hacer el practicum, aunque el código en sí no guarda ninguna relación.
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{ganttchart}[
+        hgrid,
+        vgrid,
+        time slot format=isodate-yearmonth,
+        compress calendar
+        ]{2016-9}{2017-7}
+        \setganttlinklabel{f-s}{}
+
+        \gantttitlecalendar{year, month} \\
+        \ganttbar{Investigación}{2016-09}{2016-11} \\
+        \ganttbar{Doc2Vec}{2017-03}{2017-03} \\
+        \ganttbar{LSA MVP1}{2016-10}{2016-11} \\
+        \ganttbar{LSA MVP2}{2016-12}{2017-01} \\
+        \ganttbar{LSA MVP3}{2017-02}{2017-03} \\
+        \ganttbar{ALS MVP1}{2016-09}{2016-12} \\
+        \ganttbar{ALS MVP2}{2017-01}{2017-02} \\
+        \ganttbar{ALS MVP3}{2017-03}{2017-03} \\
+        \ganttbar{Desarrollo Interfaz}{2017-04}{2017-05} \\
+        \ganttmilestone{Fin Desarrollo}{2017-05} \\
+        \ganttbar{Documentación}{2017-05}{2017-06} \\
+        \ganttmilestone{Entrega \& Presentación}{2017-06}{2017-06}
+
+        \ganttlink{elem0}{elem1}
+        \ganttlink{elem0}{elem2}
+
+        \ganttlink[link type=f-s]{elem2}{elem3}
+        \ganttlink[link type=f-s]{elem3}{elem4}
+
+        \ganttlink[link type=f-s]{elem5}{elem6}
+        \ganttlink[link type=f-s]{elem6}{elem7}
+
+        \ganttlink[link type=f-s]{elem1}{elem8}
+        \ganttlink[link type=f-s]{elem4}{elem8}
+        \ganttlink[link type=f-s]{elem7}{elem8}
+
+        \ganttlink{elem8}{elem9}
+        \ganttlink{elem10}{elem11}
+    \end{ganttchart}
+    \caption{Diagrama de Gantt con tiempos del proyecto}
+\end{figure}
+
+
+\chapter{Recolección de datos}
+El primer paso es la obtención de datos con los que hacer las recomendaciones y entrenar los modelos. Para esta tarea se ha usado Scrapy\cite{scrapy}, un paquete de Python\index{Python} con el que crear crawlers de Internet.
+
+\begin{figure}[!htbp]
+    \begin{tikzpicture}[node distance=2cm]
+        \centering
+        \node (init) [startstop] {Top 1000 IMDb};
+        \node (link1) [decision, below of=init] {URL};
+        \node (pelicula-init) [startstop, below of=link1] {Película};
+        \node (link2) [decision, below of=pelicula-init, yshift=-2cm] {URL};
+        \node (keywords) [process, right of=link2, xshift=2cm] {Palabras clave};
+        \node (info) [process, above of=keywords] {Información};
+        \node (reviews) [startstop, below of=link2] {Críticas};
+        \node (link3) [decision, below of=reviews] {URL};
+        \node (reviews-1) [process, right of=reviews, xshift=2cm] {Crítica};
+        \node (database) [database, right of=link1, xshift=3cm] {BD};
+        \begin{scope}[on background layer]
+            \node (bbox) [rectangle,draw,minimum width=2cm] [fit = (info) (keywords) (reviews-1),fill=yellow!30,label=above:Película] {};
+        \end{scope}
+
+        \draw [line] (init) -- (link1);
+        \draw [line] (link1) to [bend left] node[anchor=east] {página} (init);
+        \draw [line] (link1) -- node[anchor=north] {¿visitado?} (database);
+        \draw [line] (database) |- node[anchor=west] {no} (pelicula-init);
+        \draw [line] (pelicula-init) -- (link2);
+        \draw [line] (pelicula-init) |- (info);
+        \draw [line] (link2) -- (keywords);
+        \draw [line] (link2) -- (reviews);
+        \draw [line] (reviews) -- (link3);
+        \draw [line] (link3) to [bend left] node[anchor=east] {página} (reviews);
+        \draw [line] (link3) -| (reviews-1);
+    \end{tikzpicture}
+    \caption{Diagrama de flujo de la descarga de datos}
+\end{figure}
+
+El crawler inicia a indexar en la pagina de top 1000 películas por valoración de los usuarios (link). El crawler descarga los siguientes datos de cada película.
+
+\setlength{\columnseprule}{0pt}
+\begin{multicols}{2}
+    \begin{itemize}
+        \item Título
+        \item Directores
+        \item Año
+        \item Género
+        \item Sinopsis
+        \item Críticas
+        \item Palabras claves
+        \item Carátula
+        \item URL
+    \end{itemize}
+\end{multicols}
+
+El crawler entra en todos los enlaces de la pagina inicial. Si el siguiente enlace es la siguiente lista de películas repite el proceso. Si el enlace pertenece a una película se descarga los datos y busca la pagina de las keywords, sinopsis y criticas. Si el enlace no es la ficha de una película ni parte de la lista se descarta. Este proceso termina cuando no queda ningún enlace por indexar. Este proceso se realiza de manera asíncrona (explicar) usando Python\index{Python} 3.6.
+
+Como criticas se descargan como máximo las 25 con mejores valoraciones. Esto, junto a la sinopsis forman los datos con los que entrenar tanto el modelo Doc2Vec\index{Doc2Vec} como el \acrshort{lsa}\index{LSA}.
+
+Todo el texto descargado esta en inglés. Si algunos de los datos estuviese en otro idioma sería necesario traducirlo o descartarlo. En una primera versión se descargaban datos tanto en inglés como en español y se traducía usando la \href{https://www.microsoft.com/en-us/translator/translatorapi.aspx}{acrshort{api} de traducción de Microsoft}. Finalmente se eliminó, ya que por lo general la mayoría de contenido del top 1000 de IMDb\cite{imdb}\index{IMDb} es de habla inglesa, al igual que la mayoría de críticas escritas allí. Eliminando los datos en castellano se simplificaba el código y se elimina una dependencia de un servicio externo.
+
+Toda la información se guarda en ficheros \acrshort{json}\index{JSON}. Un ejemplo de documento es:
+
+\inputminted[xleftmargin=21pt, breaklines=true, tabsize=2]{json}{figures/example.json}
+
+\chapter{Limpieza de textos}\label{chap:clean}
+El preprocesado de los textos es una parte esencial del procesamiento del lenguaje natural. Sin este paso la precisión del modelo es mucho menor ya que el modelo tendrá mucho ruido. Es importante eliminar todas las ambigüedades posibles para poder relacionar los conceptos que existen dentro de los textos y así ayudar a los algoritmos a cumplir su función.
+
+Algunas de las técnicas más comunes incluyen eliminar tiempos verbales, signos de puntuación, distinción entre palabras singulares y plurales, masculinas y femeninas, mayúsculas y minúsculas, palabras muy comunes, etc.\
+
+\section{POS Tagger}
+En primer lugar separamos cada documento en frases. Se usa un POS Tagger entrenado con el Penn Treebank tagset\cite{penn-treebank} (el tagger por defecto de NLTK\cite{NLTK}):
+
+\begin{verbatim}
+    Zeus is a Greek God.
+\end{verbatim}
+
+Quedaría tagueado así
+
+\begin{figure}[!htbp]
+    \centering
+    \inline{Zeus}{NNP} \inline{is}{VBZ} \inline{a}{DT} \inline{Greek}{NN} \inline{God}{NNP}.
+    \floatfoot{Donde NNP es nombre propio, VBZ un verbo, DT determinante y NN nombre común}
+    \caption{Resultados del POS tagging}
+\end{figure}
+
+\section{Reemplazar sustantivos por hiperónimos}
+Cualquier sustantivo se intenta reemplazar por un hiperónimo (palabra de la misma familia pero de categoría más general, como animal es a perro o audio a altavoz). Para obtener el hiperónimo de forma precisa usamos la función lesk\cite{Lesk:1986:ASD:318723.318728} de NLTK\cite{NLTK}, que detecta el contexto de una palabra (es capaz de diferenciar gato de herramienta a gato de animal dependiendo de las palabras que rodean a la palabra en cuestión).
+
+El resultado de lesk\cite{Lesk:1986:ASD:318723.318728} es una lista ordenada por relevancia de hiperónimos del blob. Se reemplaza por el primer resultado (el más relevante).
+
+Así el texto se convertirá en:
+\begin{center}
+    \begin{verbatim}
+        Zeus is a country deity.
+    \end{verbatim}
+\end{center}
+
+\section{Eliminación de nombres propios}
+Los nombres propios se eliminan porque se detectó que si dos personajes de películas diferentes se llamaban igual la similitud resultante de los cálculos con \acrshort{lsa}\index{LSA} muy alta, aunque las películas no tengan nada que ver. Para evitar esto se eliminan.
+
+Así el texto se convertirá en:
+\begin{verbatim}
+    is a country deity.
+\end{verbatim}
+
+\section{Filtrar Stopwords}
+En este paso se elimina cualquier token que coincida con los stopwords de la lista inglesa de NLTK\cite{NLTK} y cualquier número. Esta lista incluye palabras muy comunes como `i', `me', `my', `am', `those', `few', etc.
+
+También se eliminan los signos de puntuación y se pasan todas las palabras a minúsculas.
+
+%\inputminted[firstline=115, lastline=132, xleftmargin=21pt, breaklines=true, tabsize=4]{python}{../movie-pepper-back/tfidf_lsa.py}
+
+Nuestro texto anterior ahora se convertirá en:
+\begin{verbatim}
+    country deity
+\end{verbatim}
+
+\section{Stemmer}
+El ultimo paso del filtrado del texto es pasar el SnowBall\cite{snowball} stemmer de NLTK\cite{NLTK}\@. En este caso Snowball usa el algoritmo de Porter\cite{porter}.
+
+El stemming reduce cualquier palabra a su raíz, eliminando las partes de palabras que las hacen plurales, masculino o femenino y  diferentes tiempos verbales, entre otros. Esto permite a nuestro recomendador interpretar palabras similares en los diferentes documentos como iguales. Algunos ejemplos:
+
+\begin{center}
+consign $\Rightarrow$ consign
+
+consigned $\Rightarrow$ consign
+
+consigning $\Rightarrow$ consign
+
+consignment $\Rightarrow$ consign
+\end{center}
+
+Siguiendo con el mismo ejemplo:
+\begin{verbatim}
+    counti deiti
+\end{verbatim}
+
+Esto relacionará palabras como counties, country, countries, etc.
+
+\chapter{LSA}\label{chap:lsa}
+\acrfull{lsa} es el algoritmo en el que se basa el primer modelo de recomendación implementado en el proyecto. Se trata de una serie de técnicas usadas para determinar la distribución semántica y la relación entre documentos extrayendo conceptos. La hipótesis principal de \acrshort{lsa} es que las palabras que tienen alguna relación relación semántica ocurrirán en documentos que también tienen una relación.
+
+Estas técnicas se empezaron a desarrollar en los años 60\cite{Borko:1963:ADC:321160.321165}, pero se popularizaron en los años 90\cite{Deerwester90indexingby}. A día de hoy sigue siendo una de las técnicas más usadas dentro del procesamiento del lenguaje natural.
+
+\section{TF-IDF}
+El \acrfull{tfidf}\index{TF-IDF} calcula lo relevante que es una palabra dentro de un conjunto de documentos.Construye una matriz de relevancia por documento, donde cada casilla representa la relevancia de un termino en él. Cuanto más aparece un termino en un documento, más relevante es, pero cuanto más aparece en global, menos peso tendrá. El 83\% de los recomendadores que usan textos se basan en este algoritmo\cite{Beel2016}.
+
+Algunos de los parámetros que se pueden ajustar son el número mínimo y máximo de veces que un termino puede aparecer en el conjunto para entrar dentro del calculo. También se puede ajustar el número de palabras máximas a analizar. Si ese número se sobrepasa se eliminan las palabras con menos relevancia. En el \autoref{chap:opt} se ajustarán los parámetros para ver cuales son los idóneos para esta tarea.
+
+\begin{equation} \label{eq:tf-idf}
+    tfidf(t, d, D) = tf(t, d) \cdot idf(t, D)
+\end{equation}
+
+\begin{equation} \label{eq:tf}
+    tf(t, d) = \dfrac{f_{t, d}}{\sum_{t' \epsilon d}^{}f_{t', d}}
+\end{equation}
+
+\begin{equation} \label{eq:idf}
+    idf(t, d) = \log\biggl(\dfrac{|D|}{1 + \{d \epsilon D : t \epsilon d \}}\biggr)
+\end{equation}
+
+Para cada conjunto de documentos filtrados se hace el \acrshort{tfidf}\index{TF-IDF} y quedan las palabras mas relevantes de cada película. Un pequeño ejemplo sería:
+
+\begin{figure}[!htbp]
+    \centering
+    \[tfidf =
+        \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+            \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                0.39&0.16&0.19&0.01&0.25&0.79&0.27 \\
+                0.12&0.12&0.06&0.46&0.21&0.07&0.83 \\
+                0.46&0.55&0.15&0.55&0.22&0.27&0.11 \\
+                0.00&0.60&0.51&0.00&0.00&0.60&0.00 \\
+                0.41&0.00&0.35&0.83&0.00&0.00&0.00 \\
+            };
+            \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {says};
+            \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {just};
+            \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {room};
+            \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {dead};
+            \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {asks};
+            \node[above=10pt of m-1-6, rotate=45, yshift=3mm, xshift=3mm] (top-6) {ship};
+            \node[above=10pt of m-1-7, rotate=45, yshift=3mm, xshift=3mm] (top-7) {mother};
+
+            \node[left=12pt of m-1-1] (left-1) {The Matrix};
+            \node[left=12pt of m-2-1] (left-2) {Alien};
+            \node[left=12pt of m-3-1] (left-3) {Serenity};
+            \node[left=12pt of m-4-1] (left-4) {Casablanca};
+            \node[left=12pt of m-5-1] (left-5) {Amelie};
+        \end{tikzpicture}
+    \]
+    \caption{Ejemplo matriz \acrshort{tfidf}\index{TF-IDF}}
+\end{figure}
+
+Esto crea una matriz por cada documentos del corpus. Cada casilla corresponde a una palabra del vocabulario y su valor es la relevancia de esa palabra en ese documento. Si fuese necesario, en este paso se pueden extraer los tokens más relevantes de cada documento para su posterior uso. Cuando se ejecute \acrshort{svd}\index{SVD} se perderán esos datos. Para el recomendador no va a ser necesario guardar esta información.
+
+El código para realizar la matriz \acrshort{tfidf} se basa en la implementación de scikit-learn\cite{scikit-learn}
+
+\section{Descomposición en valores singulares}
+Con \acrfull{svd}\index{SVD} reducimos la dimensionalidad de las matrices calculadas con \acrshort{tfidf}\index{TF-IDF}. Esto acelera de una manera muy significativa los cálculos y además soluciona el problema de la polisemia. Existen varias formas de calcular el \acrshort{svd}\index{SVD}, pero scikit-learn implementa el algoritmo descrito en \citetitle{2009arXiv0909.4061H}
+
+\acrshort{svd}\index{SVD} busca descomponer una matriz natural en 3 matrices diferentes diferentes. A representa la matriz de documentos donde cada file representa los diferentes términos y las columnas representan los diferentes documentos.\cite{stanford-svd}
+
+\begin{figure}[!htbp]
+    \centering
+    \[A =
+        \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+            \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                1&1&1&0&0 \\
+                3&3&3&0&0 \\
+                4&4&4&0&0 \\
+                5&5&5&0&0 \\
+                0&2&0&4&4 \\
+                0&0&0&5&5 \\
+                0&1&0&2&2 \\
+            };
+            \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {Matrix};
+            \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {Alien};
+            \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {Serenity};
+            \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {Casablanca};
+            \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {Amelie};
+
+            \node[left=12pt of m-1-1] (left-1) {action};
+            \node[left=12pt of m-2-1] (left-2) {gun};
+            \node[left=12pt of m-3-1] (left-3) {shoot};
+            \node[left=12pt of m-4-1] (left-4) {run};
+            \node[left=12pt of m-5-1] (left-5) {love};
+            \node[left=12pt of m-6-1] (left-6) {peace};
+            \node[left=12pt of m-7-1] (left-7) {kiss};
+
+            \node[rectangle,left delimiter=\{, xshift=-3mm] (del-left-1) at ($0.6*(left-1.east) + 0.5*(left-4.east)$) {\tikz{\path (left-1.north east) rectangle (left-4.south west);}};
+            \node[left=10pt] at (del-left-1.west) {Action};
+            \node[rectangle,left delimiter=\{, xshift=-3mm] (del-left-2) at ($0.6*(left-5.east) + 0.5*(left-7.east)$) {\tikz{\path (left-5.north east) rectangle (left-7.south west);}};
+            \node[left=10pt] at (del-left-2.west) {Romantic};
+
+        \end{tikzpicture}
+        = U \cdot \Sigma \cdot V^T
+    \]
+    \caption{Ejemplo matriz \acrshort{lsa}\index{LSA}}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \[
+        U =
+        \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+            \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                0.13&0.02&-0.01& \\
+                0.41&0.07&-0.03& \\
+                0.55&0.09&-0.04& \\
+                0.68&0.11&-0.05& \\
+                0.15&-0.59&0.65& \\
+                0.07&-0.73&0.67& \\
+                0.07&-0.29&0.32& \\
+            };
+
+            \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=5mm] (top-1) {Sci-Fi topic};
+            \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=5mm] (top-2) {Romance topic};
+            \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=5mm] (top-3) {Ruido};
+
+            \node[left=12pt of m-1-1] (left-1) {action};
+            \node[left=12pt of m-2-1] (left-2) {gun};
+            \node[left=12pt of m-3-1] (left-3) {shoot};
+            \node[left=12pt of m-4-1] (left-4) {run};
+            \node[left=12pt of m-5-1] (left-5) {love};
+            \node[left=12pt of m-6-1] (left-6) {peace};
+            \node[left=12pt of m-7-1] (left-7) {kiss};
+
+        \end{tikzpicture}
+    \]
+    \floatfoot{Donde U se considera la matriz palabra-a-categoría}
+    \caption{Matriz \acrshort{lsa}\index{LSA} palabra a categoría}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \[
+        \Sigma =
+        \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+            \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                12.4&0&0& \\
+                0&9.5&0& \\
+                0&0&1.3& \\
+            };
+
+            \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=5mm] (top-1) {Sci-Fi topic};
+            \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=5mm] (top-2) {Romance topic};
+            \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=5mm] (top-3) {Ruido};
+        \end{tikzpicture}
+    \]
+    \floatfoot{Donde $\Sigma$ se considera la matriz de importancia de cada categoría}
+    \caption{Ejemplo matriz $\Sigma$ de \acrshort{lsa}\index{LSA}}\label{matrix-topics}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \[
+        V^T =
+        \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+            \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                0.56&0.59&0.56&0.09&0.09 \\
+                0.12&-0.02&0.12&-0.69&-0.69 \\
+                0.40&-0.80&0.40&0.09&0.09 \\};
+
+            \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {Matrix};
+            \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {Alien};
+            \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {Serenity};
+            \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {Casablanca};
+            \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {Amelie};
+
+            \node[left=12pt of m-1-1] (left-1) {Sci-Fi topic};
+            \node[left=12pt of m-2-1] (left-2) {Romance topic};
+            \node[left=12pt of m-3-1] (left-3) {Ruido};
+
+        \end{tikzpicture}
+    \]
+    \floatfoot{$V^T$ se considera la matriz de documento-a-categoría}
+    \caption{Matriz \acrshort{lsa}\index{LSA} documento a categoría}\label{matrix-dac}
+\end{figure}
+
+Es importante recordar que para cualquier matriz natural A es posible calcular su \acrshort{svd}\index{SVD} donde:
+U, $\Sigma$ \& V son únicos
+U \& V son ortonormales:
+\begin{equation}
+    U^T \cdot U = I
+\end{equation}
+
+\begin{equation}
+    V^T \cdot V = I
+\end{equation}
+$\Sigma$ es diagonal y sus valores singulares están en orden descendiente ($\sigma_{1}$ > $\sigma_{2}$ > $\sigma_{3}$\ldots)
+
+Estas matrices se guardan en el mismo documento dentro de la base de datos y se usan a la hora de recomendar haciendo la distancia del coseno entre las matrices de dos películas. La implementación del \acrshort{lsa}\index{LSA} también se basa en la de scikit-learn\cite{scikit-learn}
+
+También es normal reducir la dimensionalidad eliminando los conceptos que tengan menor relevancia en nuestros cálculos. En este ejemplo, el concepto llamado `Ruido' tiene una relevancia mucho menor que los otros dos conceptos (figura~\ref{matrix-topics}), y por tanto se puede eliminar ya que no aportará mucha información (figura~\ref{reduced-matrix-dac}).
+
+\begin{figure}[!htbp]
+    \centering
+    \[
+        V^T =
+        \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+            \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                0.56&0.59&0.56&0.09&0.09 \\
+                0.12&-0.02&0.12&-0.69&-0.69 \\};
+
+            \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {Matrix};
+            \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {Alien};
+            \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {Serenity};
+            \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {Casablanca};
+            \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {Amelie};
+
+            \node[left=12pt of m-1-1] (left-1) {Sci-Fi topic};
+            \node[left=12pt of m-2-1] (left-2) {Romance topic};
+
+        \end{tikzpicture}
+    \]
+    \floatfoot{$V^T$ después de la eliminación del concepto `Ruido'}
+    \caption{Matriz \acrshort{lsa}\index{LSA} documento a categoría reducida}\label{reduced-matrix-dac}
+\end{figure}
+
+\section{Similitud del coseno}
+Para obtener los valores finales de \acrshort{lsa}\index{LSA} se debe calcular la similitud del coseno entre los vectores de documentos. Esto nos da un valor entre -1 y 1 pero como nos movemos en un espacio positivo los valores finales serán entre 0 y 1. En las figuras~\ref{cos-low} y~\ref{cos-high} se puede ver una representación gráfica en 2D.
+
+\begin{equation}
+    \cos(\theta) = \dfrac{\sum_{i=1}^{n} A_i \cdot B_i}{\sqrt{\sum_{i=1}^{n} A_i^2} \cdot \sqrt{\sum_{i=1}^{n} B_i^2}}
+\end{equation}
+
+Siguiendo con el ejemplo anterior:
+
+\begin{figure}[!htbp]
+    \begin{equation}
+        \cos\left(
+            \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+                \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {0.56\\0.12\\};
+            \end{tikzpicture}
+            ,
+            \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+                \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {0.59\\-0.02\\};
+            \end{tikzpicture}
+        \right) = 0.97
+    \end{equation}
+    \caption{Alta similitud entre Matrix y Alien}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \begin{equation}
+        \cos\left(
+            \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+                \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {0.56\\0.12\\};
+            \end{tikzpicture}
+            ,
+            \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+                \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {0.09\\-0.69\\};
+            \end{tikzpicture}
+        \right) = -0.08
+    \end{equation}
+    \caption{Baja similitud entre Matrix y Amelie}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[t]{0.4\textwidth}
+        \begin{tikzpicture}
+            \draw[help lines, color=gray!30, dashed] (-1,-1) grid (4,4);
+            \draw[dashed] (0,0)--(4,0);
+            \draw[dashed] (0,0)--(0,4);
+            \draw[dashed] (0,0)--(-1,0);
+            \draw[dashed] (0,0)--(0,-1);
+            \draw[arrow] (0,0) -- ++(30:3cm);
+            \draw[arrow] (0,0) -- ++(40:3cm);
+            \draw ([shift=(30:1cm)]0,0) arc (30:40:1cm) node [above=50pt, xshift=40pt, align=left] {$\theta$=$\sim$10\textdegree\\cos($\theta$)=$\sim$0.98};
+        \end{tikzpicture}
+        \caption{Alta similitud del coseno}\label{cos-high}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.4\textwidth}
+        \centering
+        \begin{tikzpicture}
+            \draw[help lines, color=gray!30, dashed] (-1,-1) grid (4,4);
+            \draw[dashed] (0,0)--(4,0);
+            \draw[dashed] (0,0)--(0,4);
+            \draw[dashed] (0,0)--(-1,0);
+            \draw[dashed] (0,0)--(0,-1);
+            \draw[arrow] (0,0) -- ++(10:3cm);
+            \draw[arrow] (0,0) -- ++(80:3cm);
+            \draw ([shift=(10:1cm)]0,0) arc (10:80:1cm) node [above, xshift=50pt, align=left] {$\theta$=$\sim$80\textdegree\\cos($\theta$)=$\sim$0.17};
+        \end{tikzpicture}
+        \caption{Baja similitud del coseno}\label{cos-low}
+    \end{subfigure}
+    \caption{Visualización de la similitud del coseno}
+\end{figure}
+
+\chapter{Doc2Vec}\index{Word2Vec}\index{Doc2Vec}
+Word2Vec\cite{DBLP:journals/corr/abs-1301-3781}\index{Word2Vec} es un algoritmo de tipo \Gls{word-embedding} creado por Google en 2013. Doc2Vec\index{Doc2Vec} es es un algoritmo que se basa en Word2Vec\index{Word2Vec} pero trabajando sobre múltiples documentos para así tener vectores de párrafo en vez de vectores de palabras. Fue desarrollado en 2014 por los mismos investigadores de Google\cite{DBLP:journals/corr/LeM14}, aunque no lo llamaron Doc2Vec\index{Doc2Vec} (así se llama la implementación en Gensim\cite{rehurek_lrec}).
+
+Este algoritmo se va a usar para tratar de descubrir que películas tienen más relación entre sí y así poder crear otro modelo de recomendación similar al creado en el capítulo \autoref{chap:lsa}.
+
+Para explicar el funcionamiento de Doc2Vec\index{Doc2Vec} es esencial hablar antes de Word2Vec\index{Word2Vec}.
+
+\section{Word2Vec}\index{Word2Vec}
+Word2Vec\index{Word2Vec} crea una red neuronal con una única capa oculta. Existen dos modelos, \acrfull{cbow} y Skip-Gram, el segundo dando, por lo general, mejores resultados.
+
+El objetivo del modelo \acrshort{cbow} es predecir la posibilidad de que una palabra aparezca en un contexto dado. Por el contrario, el objetivo de un modelo Skip-Gram es el de predecir que palabras aparecen en el contexto de una palabra. A continuación se explica el funcionamiento, a alto nivel, del modelo Skip-Gram.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[t]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/fig-cbow.pdf}
+        \caption{Modelo \acrshort{cbow} de Word2Vec\cite{DBLP:journals/corr/Rong14}\index{Word2Vec}}\label{cbow}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/fig-skip-gram.pdf}
+        \caption{Modelo skip-gram de Word2Vec\cite{DBLP:journals/corr/Rong14}\index{Word2Vec}}\label{skip-gram}
+    \end{subfigure}
+    \caption{Modelos Word2Vec\index{Word2Vec}}
+\end{figure}
+
+En primer lugar definamos el contexto de las palabras en un corpus. Se elige una ventana de palabras (normalmente un valor entre 2 y 5). Para cada palabra de nuestro corpus creamos parejas de palabras dentro de su ventana por el lado izquierdo y derecho, como se muestra en la tabla~\ref{tab:w2v-window}.
+
+\begin{table}
+    \centering
+    \begin{tabular}{cp{45mm}}
+        \toprule
+        Source Text & Training Samples \\
+        \midrule
+        \colorbox{blue!20}{\colorbox{red!20}{The} quick brown} fox jumps over the lazy dog & (`the', `quick') \newline (`the', `brown') \\
+        \midrule
+        \colorbox{blue!20}{The \colorbox{red!20}{quick} brown fox} jumps over the lazy dog & (`quick', `the') \newline (`quick', `brown') \newline (`quick', `fox') \\
+        \midrule
+        \colorbox{blue!20}{The quick \colorbox{red!20}{brown} fox jumps} over the lazy dog & (`brown', `the') \newline (`brown', `quick') \newline (`brown', `fox') \newline (`brown', `jumps') \\
+        \midrule
+        The \colorbox{blue!20}{quick brown \colorbox{red!20}{fox} jumps over} the lazy dog & (`fox', `quick') \newline (`fox', `brown') \newline (`fox', `jumps') \newline (`fox', `over') \\
+        \bottomrule
+    \end{tabular}
+    \caption{Ventana deslizante en Word2Vec\index{Word2Vec}}\label{tab:w2v-window}
+\end{table}
+
+Con las palabras y sus contextos definidos se puede empezar a entrenar nuestro modelo. La figura~\ref{skip-gram} muestra una representación gráfica de la red neuronal que se va a entrenar.
+
+El entrenamiento necesitará 3 capas (input, oculta y output). El número de neuronas en el input y el output será igual al número de palabras en el vocabulario, mientras que el número de neuronas en la capa oculta es un parámetro del modelo que se puede ajustar. Los investigadores que desarrollaron este modelo recomiendan elegir entre 50 y 500 neuronas\cite{DBLP:journals/corr/abs-1301-3781}.
+
+En el input pasarán vectores \gls{one-hot} que representan cada palabra (normalmente en orden alfabético), como se puede ver en la figura~\ref{one-hot}.
+
+\begin{table}
+    \centering
+    \begin{tabular}{ccc}
+        \toprule
+        Palabra & Posición por orden alfabético & Vector\\
+        \midrule
+        fox & 2/3 & [0, 1, 0]\\
+        dog & 1/3 & [1, 0, 0]\\
+        zebra & 3/3 & [0, 0, 1]\\
+        \bottomrule
+    \end{tabular}
+    \caption{Vectores \gls{one-hot}}\label{one-hot}
+\end{table}
+
+Las matrices W y W' se inicializan con unos valores aleatorios, como en cualquier red neuronal. Esta red tiene una función de activación lineal que lo único que hace es pasar a la capa oculta la fila que representa la palabra del input de la matriz W (figura~\ref{h-selection}).
+
+\begin{figure}[!htbp]
+    \centering
+    \[
+        \begin{tikzpicture}[baseline=-0.65ex,scale=0.5]
+            \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                0&0&0&1&0 \\
+            };
+        \end{tikzpicture}
+        \begin{tikzpicture}[baseline=-0.65ex,scale=0.5]
+            \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                17&24&1 \\
+                23&5&7 \\
+                4&6&13 \\
+                10&12&19 \\
+                11&18&25 \\
+            };
+            \draw[color=red] (m-4-1.north west) -- (m-4-1.south west) -- (m-4-3.south east) -- (m-4-3.north east) -- (m-4-1.north west);
+        \end{tikzpicture}
+        =
+        \begin{tikzpicture}[baseline=-0.65ex,scale=0.5]
+            \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                10&12&19 \\
+            };
+        \end{tikzpicture}
+    \]
+
+    \[X_{3} \cdot W_{VxN} = h_{3}\]
+    \caption{Función de activación lineal en Word2Vec\index{Word2Vec}}\label{h-selection}
+\end{figure}
+
+En el output habrá tantos vectores como hayamos configurado en nuestra ventana (el tamaño del contexto).
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{./figures/skip-gram-exp.png}
+    \caption{Representación visual del modelo Skip-Gram\cite{skip-gram-exp}}\label{skip-gram-exp}
+\end{figure}
+
+En cada iteración de entrenamiento se siguen los siguientes pasos (la figura~\ref{skip-gram-exp} puede ayudar a visualizar el algoritmo):
+
+\begin{itemize}
+    \item Multiplicación de h y W'
+    \item Convertir resultado a probabilidades usando \gls{softmax}
+    \item Calcular el error entre el resultado y el objetivo (usando los datos reales)
+    \item Actualizar pesos en W y W' usando backpropagation
+\end{itemize}
+
+Para realizar el cálculo probabilístico se minimiza una funciona de pérdida usando un descenso estocástico\cite{DBLP:journals/corr/Rong14}.
+
+En la práctica, usar softmax con todo el vocabulario no es realista. Para solventar éste problema se usan unas optimizaciones como usar un softmax jerárquico en vez del normal, desechar palabras poco usadas y usar `negative subsampling', entre otras.
+
+La probabilidad de que una palabra se quede en el vocabulario es:
+
+\begin{equation}
+    P(w_i) = 1 - \sqrt{\dfrac{t}{f(w_i)}}
+\end{equation}
+
+Donde t es un threshold definido por el usuario, $w_i$ una palabra en el corpus y $f(w_i)$
+
+Tras repetir los pasos el número de iteraciones de veces programado la creación del modelo habrá concluido y nuestras probabilidades se encontrarán en la matriz W (en la figura~\ref{skip-gram} entre nuestro vector de entrada y la capa oculta).
+
+Los resultados del modelo son unos vectores para cada palabra de nuestro vocabulario, que se puede comparar con otras para ver su similitud.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{./figures/res-w2v.png}
+    \caption{Vectores de resultado de Word2Vec\index{Word2Vec} en 2D\cite{nlp-gensim}}\label{w2v-general}
+\end{figure}
+
+En la tabla~\ref{tab:w2v-res} se pueden ver algunos resultados reales del modelo entrenado con críticas de IMDb\index{IMDb}. La figura~\ref{w2v-general} representa los vectores de un modelo general, visualizado en un plano 2D.
+
+\rowcolors{2}{gray!25}{white}
+\begin{table}
+    \begin{tabularx}{\textwidth}{XXXXXX}
+        \toprule
+        \hiderowcolors Palabra clave & \multicolumn{5}{c}{Palabras similares}\\ \showrowcolors
+        \midrule
+        \textbf{mafia} & dealer & banker & mob & mexican & drug\\
+        \textbf{axe} & expedition & undercover & biker & employee & outlaw\\
+        \textbf{hair} & clothes & coat & eyes & teeth & makeup\\
+        \textbf{airplane} & announcer & sanctuary & engine & accident & ambushed\\
+        \textbf{plant} & retrieve & investigate & thwart & unearth & escape\\
+        \textbf{air} & automatic & oil & swinging & oxygen & ocean\\
+        \bottomrule
+    \end{tabularx}
+    \caption{Resultados Word2Vec\index{Word2Vec}}\label{tab:w2v-res}
+\end{table}
+
+\section{Doc2Vec}
+Conceptualmente, Doc2Vec\index{Doc2Vec} es un algoritmo muy similar a Word2Vec\index{Word2Vec}, pero distribuyendo el vocabulario entre varios documentos (o párrafos).
+
+Existen dos modelos diferentes que, de alguna manera, extienden las dos implementaciones de Word2Vec\index{Word2Vec}: Distributed Memory Model \& Distributed Bag of Words. En muchas tareas DBOW funciona mejor, aunque una combinación de los dos modelos da resultados mas consistentes\cite{DBLP:journals/corr/LeM14}.
+
+El Distributed Memory Model se basa en el modelo \acrshort{cbow}, pero añadiendo en el input el id del documento correspondiente y agregando el vector resultante al vector W.
+
+El Distributed Bag of Words Model (figura~\ref{d2v-dbow}) se basa en el modelo Skip-Gram de Word2Vec\index{Word2Vec}. En el input, en vez de aparecer una palabra aparece el id de un documento. La red luego se entrena con un subconjunto de contextos del documento.
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{subfigure}[t]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./figures/distributed_memory_model.pdf}
+        \caption{Doc2Vec\index{Doc2Vec} Distributed Memory Model}\label{d2v-dmm}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./figures/distributed_bag_of_words.pdf}
+        \caption{Doc2Vec\index{Doc2Vec} Distributed Bag of Words Model}\label{d2v-dbow}
+    \end{subfigure}
+    \caption{Modelos Doc2Vec\index{Doc2Vec}}
+\end{figure}
+
+En ambos casos el resultado del modelo vuelven a ser vectores correspondientes a los documentos con los que se ha entrenado y se pueden hacer las mismas comparaciones que con los vectores de Word2Vec\index{Word2Vec}.
+
+\chapter{E-Modelo}\index{E-Modelo}
+E-Modelo\cite{emodelo}\index{E-Modelo} es un algoritmo de recomendación híbrido que intenta aunar el procesamiento de lenguaje natural y los conceptos extraídos de textos con un filtrado colaborativo. Para el filtrado colaborativo se usa \acrfull{als} (la implementación distribuida de Apache Spark\index{Apache Spark}).
+
+En primer lugar es necesario obtener un buen corpus de datos de usuarios y textos. Existen varios datasets como los de Amazon\index{Amazon} y IMDb\index{IMDb}. Para los experimentos realizados se usó un dataset con datos de Amazon\index{Amazon}, pero el algoritmo se podría aplicar a otros ámbitos.
+
+El dataset contiene textos de críticas de usuarios de un producto en particular. Cada producto y cada usuario tiene un identificador único.
+
+Hacemos un procesamiento de los diferentes textos extrayendo palabras clave. El proceso es similar al explicado en el \autoref{chap:clean}.
+
+La matriz del filtrado colaborativo es una matriz tridimensional donde los ejes corresponden a usuarios, productos y palabras.
+
+\begin{figure}[!htbp]
+    \begin{tikzpicture}[every node/.style={anchor=north east,fill=white,minimum width=1cm,minimum height=5mm}]
+        \matrix (mA) [draw,matrix of math nodes]
+        {
+            1 & 1 & 0 \\
+            0 & 1 & 0 \\
+            -1 & -1 & -1 \\
+        };
+
+        \matrix (mB) [draw,matrix of math nodes] at ($(mA.south west)+(1.5,0.7)$)
+        {
+            -1 & -1 & -1 \\
+            0 & 2 & 0 \\
+            -1 & -1 & -1 \\
+        };
+
+        \matrix (mC) [draw,matrix of math nodes] at ($(mB.south west)+(1.5,0.7)$)
+        {
+            -1 & -1 & -1 \\
+            0 & 1 & 0 \\
+            0 & 0 & 2 \\
+        };
+
+        \node[above=10pt of mA-1-1, rotate=45, yshift=1mm, xshift=8mm] (top-1) {Palabra 1};
+        \node[above=10pt of mA-1-2, rotate=45, yshift=1mm, xshift=8mm] (top-2) {Palabra 2};
+        \node[above=10pt of mA-1-3, rotate=45, yshift=1mm, xshift=8mm] (top-3) {Palabra 3};
+
+        \node[left=12pt of mC-1-1] (left-1) {Usuario 1};
+        \node[left=12pt of mC-2-1] (left-2) {Usuario 2};
+        \node[left=12pt of mC-3-1] (left-3) {Usuario 3};
+
+        \node[right=12pt of mC-2-3, yshift=-3mm] (right-1) {Producto 3};
+        \node[right=12pt of mB-2-3, yshift=-3mm] (right-2) {Producto 2};
+        \node[right=12pt of mA-2-3, yshift=-3mm] (right-3) {Producto 1};
+
+        \draw[dashed](mA.north east)--(mC.north east);
+        \draw[dashed](mA.north west)--(mC.north west);
+        \draw[dashed](mA.south east)--(mC.south east);
+    \end{tikzpicture}
+    \caption{Matriz 3D del E-Modelo\index{E-Modelo}}
+\end{figure}
+
+Para calcular el resultado de \acrshort{als}\index{ALS} es necesario reducir a dos dimensiones la matriz del E-Modelo\index{E-Modelo}. Para ello pasamos las palabras a columnas, para representar productos-palabra.
+
+\begin{figure}[!htbp]
+    \centering
+    \vspace*{8mm}
+    \begin{tikzpicture}[baseline=-0.65ex,scale=0.8,decoration=brace]
+        \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+            1 & 1 & 0 & -1 & -1 & -1 & -1 & -1 & -1 \\
+            0 & 1 & 0 & 0 & 2 & 0 & 0 & 1 & 0 \\
+            -1 & -1 & -1 & -1 & -1 & -1 & 0 & 0 & 2 \\
+        };
+        \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {Palabra 1};
+        \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {Palabra 2};
+        \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {Palabra 3};
+        \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {Palabra 1};
+        \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {Palabra 2};
+        \node[above=10pt of m-1-6, rotate=45, yshift=3mm, xshift=3mm] (top-6) {Palabra 3};
+        \node[above=10pt of m-1-7, rotate=45, yshift=3mm, xshift=3mm] (top-7) {Palabra 1};
+        \node[above=10pt of m-1-8, rotate=45, yshift=3mm, xshift=3mm] (top-8) {Palabra 2};
+        \node[above=10pt of m-1-9, rotate=45, yshift=3mm, xshift=3mm] (top-9) {Palabra 3};
+
+        \node[left=20pt of m-1-1] (left-1) {Usuario 1};
+        \node[left=20pt of m-2-1] (left-2) {Usuario 2};
+        \node[left=15pt of m-3-1] (left-3) {Usuario 3}; % why not aligned?
+
+        \draw[decorate,transform canvas={yshift=2cm},thick] (m-1-1.north west) -- node[above=2pt] {Producto 1} (m-1-3.north east);
+        \draw[decorate,transform canvas={yshift=2cm},thick] (m-1-4.north west) -- node[above=2pt] {Producto 2} (m-1-6.north east);
+        \draw[decorate,transform canvas={yshift=2cm},thick] (m-1-7.north west) -- node[above=2pt] {Producto 3} (m-1-9.north east);
+    \end{tikzpicture}
+    \caption{Matriz E-Modelo\index{E-Modelo} de 2 dimensiones}
+\end{figure}
+
+Los -1 representan huecos, lo que significa que el usuario no ha escrito una crítica para ese producto en concreto. Los 0 son para palabras del vocabulario que un usuario no ha usado en una de sus crítica.
+
+En matrices más grandes se hace un filtrado posterior para eliminar palabras cuyas columnas sean demasiado dispersas para reducir la cantidad de ceros.
+
+Luego se pasa a un \acrshort{als} normal. Como el calculo de matrices muy grandes es muy elevado se usó un cluster de varios ordenadores para acelerar el análisis.
+
+Antes de crear el modelo final se optimizan probando una serie de parámetros del modelo \acrshort{als}\index{ALS} usando un 10\% de los datos para validación, un 20\% para test y un 70\% para el entrenamiento. Los vectores son escogidos al azar. Una vez probados los parámetros se crea el modelo final con la combinación que mejor resultado dio.
+
+Los parámetros son:
+
+\begin{multicols}{2}
+    \begin{itemize}
+        \item Rank
+        \item Número de iteraciones
+        \item Lambda
+        \item Seed
+    \end{itemize}
+\end{multicols}
+
+El resultado es una matriz donde los -1 que había en la matriz original se han convertido en valores estimados. Esos valores representan con que frecuencia un usuario usará una palabra en una crítica de un producto que no ha comprado. Si usamos palabras que describen gustos, como pueden ser los adjetivos calificativos, se puede distinguir cuando una persona va a estar satisfecho con su compra y cuando no.
+
+Resaltar que en este caso la recomendación vendría dada una vez se realiza la predicción de palabras para un usuario y un producto a través de un consiguiente análisis de dichas palabras (p.ej. de sentimiento). Este modelo ha sido probado en cuanto a su eficiencia en predicción\cite{emodelo} llegando tener una mejor tasa en precisión cercana al 40\%, pero todavía no es comparable con los ratios de precisión obtenidos en predicción de valoración dado su estado incipiente.
+
+\chapter{Optimización}\label{chap:opt}
+Antes de obtener unos resultados definitivos es necesario buscar los mejores parámetros de los diferentes algoritmos. No es fácil evaluar un modelo como éste, ya que no existen unos datos que usar como \textit{`\gls{groundtruth}'}.
+
+Se decidió optimizar el modelo usando películas películas que, a mi parecer, son similares entre sí y analizar que parámetros ajustaban más el resultado. Se ha usado una película de ciencia ficción, una de acción y una de animación infantil.
+
+En las gráficas todos los puntos se han movido lateralmente unos milímetros para que no se solapen en el caso de que su posición sea la misma.
+
+Las líneas en las gráficas se han extraído usando una regresión lineal simple para poder ver la tendencia de los modelos más fácilmente.
+
+\section{LSA}
+En el modelo \acrshort{lsa}\index{LSA} se pueden ajustar cuatro parámetros.
+
+\begin{itemize}
+    \item Minimum Document Frequency: El mínimo número de veces que una palabra debe aparecer en nuestro corpus de documentos para ser usado en el calculo de \acrshort{tfidf}\index{TF-IDF}.
+    \item Maximum Document Frequency: Igual que el parámetro anterior, pero para el máximo número de veces que debe aparecer una palabra.
+    \item Número de Componentes: Con cuantos componentes de \acrshort{tfidf}\index{TF-IDF} quedarnos.
+    \item Número de features: Al número de componentes al que reducir nuestros componentes usando \acrshort{lsa}\index{LSA}
+\end{itemize}
+
+Los parámetros elegidos han sido maximum document frequency 200, minimum document frequency 5, número de componentes 1000 y número de features sin límite.
+
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{0.49\linewidth}
+\setlength\figurewidth{\linewidth}
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/mindf/apocalypse.tex}
+    \caption{Resultados al modificar `Minimum Document Frequency' (Apocalypse Now)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/mindf/space.tex}
+    \caption{Resultados al modificar `Minimum Document Frequency' (2001: A Space Odyssey)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/mindf/ratatouille.tex}
+    \caption{Resultados al modificar `Minimum Document Frequency' (Ratatouille)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/maxdf/apocalypse.tex}
+    \caption{Resultados al modificar `Maximum Document Frequency' (Apocalypse Now)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/maxdf/space.tex}
+    \caption{Resultados al modificar `Maximum Document Frequency' (2001: A Space Odyssey)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/maxdf/ratatouille.tex}
+    \caption{Resultados al modificar `Maximum Document Frequency' (Ratatouille)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/ncomponents/apocalypse.tex}
+    \caption{Resultados al modificar `Number of Components' (Apocalypse Now)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/ncomponents/space.tex}
+    \caption{Resultados al modificar `Number of Components' (2001: A Space Odyssey)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/ncomponents/ratatouille.tex}
+    \caption{Resultados al modificar `Number of Components' (Ratatouille)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/nfeatures/apocalypse.tex}
+    \caption{Resultados al modificar `Number of Features' (Apocalypse Now)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/nfeatures/space.tex}
+    \caption{Resultados al modificar `Number of Features' (2001: A Space Odyssey)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/nfeatures/ratatouille.tex}
+    \caption{Resultados al modificar `Number of Features' (Ratatouille)}
+\end{figure}
+
+\section{Doc2Vec}\index{Doc2Vec}
+Al igual que en el modelo \acrshort{lsa}, en Doc2Vec\index{Doc2Vec} se pueden ajustar cuatro parámetros.
+
+\begin{itemize}
+    \item Size: Número de neuronas (o features) que aprender.
+    \item Window: Cuantas palabras usar como ventana para relacionar palabras en una frase. Ejemplo en la figura~\ref{tab:w2v-window}.
+    \item Minimum Word Count: Cuantas veces debe aparecer una palabra en nuestro corpus para que pueda ser usada como palabra válida.
+    \item Iterations: El número de veces que se entrenará la red neuronal.
+\end{itemize}
+
+Los parámetros elegidos han sido size 1000, window 5, minimum count 5 y número de iteraciones 20.
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/size/apocalypse.tex}
+    \caption{Resultados al modificar `Size' (Apocalypse Now)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/size/space.tex}
+    \caption{Resultados al modificar `Size' (2001: A Space Odyssey)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/size/ratatouille.tex}
+    \caption{Resultados al modificar `Size' (Ratatouille)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/window/apocalypse.tex}
+    \caption{Resultados al modificar `Window' (Apocalypse Now)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/window/space.tex}
+    \caption{Resultados al modificar `Window' (2001: A Space Odyssey)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/window/ratatouille.tex}
+    \caption{Resultados al modificar `Window' (Ratatouille)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/minc/apocalypse.tex}
+    \caption{Resultados al modificar `Minimum count' (Apocalypse Now)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/minc/space.tex}
+    \caption{Resultados al modificar `Minimum count' (2001: A Space Odyssey)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/minc/ratatouille.tex}
+    \caption{Resultados al modificar `Minimum count' (Ratatouille)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/iterations/apocalypse.tex}
+    \caption{Resultados al modificar `Iterations' (Apocalypse Now)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/iterations/space.tex}
+    \caption{Resultados al modificar `Iterations' (2001: A Space Odyssey)}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \input{./figures/iterations/ratatouille.tex}
+    \caption{Resultados al modificar `Iterations' (Ratatouille)}
+\end{figure}
+
+\chapter{Resultados}
+Una vez se ha decidido que parámetros usar para los modelos se pueden extraer unos resultados. En la siguientes tablas se van a comparar las recomendaciones entre los dos modelos implementados, las recomendaciones de Movistar+\index{Movistar+} y las de IMDb\index{IMDb}.
+
+Hay que tener en cuenta que las recomendaciones de un servicio como Movistar+\index{Movistar+} se ciñen a contenidos que tienen disponibles en la plataforma. También conviene recordar que el modelo implementado no está entrenado con todo el catalogo de IMDb\index{IMDb}, sino con unas 800--1000 películas con una alta popularidad.
+
+\rowcolors{2}{gray!25}{white}
+\begin{table}
+    \begin{tabularx}{\textwidth}{XXXX}
+        \toprule
+        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \midrule
+        \textbf{Star Wars IV} & \textbf{Rogue One} & Star Wars I & \textbf{Star Wars VI}\\
+        Star Trek & \textbf{Star Wars IV} & \textbf{Star Wars IV} & \textbf{Star Wars IV}\\
+        \textbf{Star Wars V} & \textbf{Star Wars V} & \textbf{Star Wars V} & \textbf{Star Wars V}\\
+        \textbf{Star Wars VI} & \textbf{Star Wars VI} & Viaje al centro de la Tierra & Star Wars III\\
+        \textbf{Rogue One} & Star Trek & \textbf{Star Wars VI} & \textbf{Rogue One}\\
+        Star Trek Into Darkness & Star Trek Into Darkness & Star Wars III & Star Wars II\\
+        Rise of the Planet of the Apes & \textbf{Guardians of the Galaxy} & & Star Wars I\\
+        Avatar & Serenity & & \textbf{Guardians of the Galaxy} \\
+        Wonder Woman & Avatar & & Avengers: Age of Ultron\\
+        Star Trek II: The Wrath of Khan & The Hobbit: The Desolation of Smaug & & Deadpool\\
+        \bottomrule
+    \end{tabularx}
+    \caption{Recomendaciones para \textit{Star Wars: Episode VII – The Force Awakens}}
+\end{table}
+
+\rowcolors{2}{gray!25}{white}
+\begin{table}
+    \begin{tabularx}{\textwidth}{XXXX}
+        \toprule
+        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \midrule
+        Strangers on a Train & \textbf{Manhattan} & The Deep Blue Sea & Vicky Cristina Barcelona\\
+        Hoosiers & \textbf{Midnight in Paris} & Lunas de hiel & Scoop\\
+        Dial M for Murder & Hannah and Her Sisters & El ilusionista & Blue Jasmine\\
+        The Royal Tenenbaums & The Grand Budapest Hotel & La mejor oferta & \textbf{Midnight in Paris}\\
+        Cast Away & Stranger Than Fiction & Tiempo de tormenta & To Rome with Love\\
+        Hannah and Her Sisters & La La Land & Lantana & Whatever Works\\
+        25th Hour & 500 Days of Summer & & \textbf{Manhattan}\\
+        Kuch Kuch Hota Hai & Tell No One & & Deconstructing Harry\\
+        The Best Years of Our Lives & In Bruges & & The Curse of the Jade Scorpion\\
+        \textbf{Manhattan} & Toni Erdmann & & Melinda and Melinda\\
+        \bottomrule
+    \end{tabularx}
+    \caption{Recomendaciones para \textit{Match Point}}
+\end{table}
+
+\rowcolors{2}{gray!25}{white}
+\begin{table}
+    \begin{tabularx}{\textwidth}{XXXX}
+        \toprule
+        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \midrule
+        \textbf{Toy Story} & \textbf{Toy Story} & \textbf{Finding Nemo} & \textbf{Toy Story 3}\\
+        \textbf{Toy Story 3} & \textbf{Toy Story 3} & Monsters, Inc. & \textbf{Toy Story}\\
+        The Lego Movie & \textbf{Finding Nemo} & \textbf{Toy Story 3} & \textbf{The Incredible}\\
+        \textbf{Monsters, Inc.} & \textbf{Monsters, Inc.} & Las Tortugas Ninja & Ratatouille\\
+        \textbf{Shrek} & \textbf{Shrek} & Bichos & \textbf{Shrek}\\
+        \textbf{Finding Nemo} & Up & \textbf{Toy Story} & \textbf{Monsters, Inc.}\\
+        Up & \textbf{The Incredibles} & & Shrek 2\\
+        Wreck-It Ralph & Despicable Me & & Finding Nemo\\
+        Inside Out & The Lego Movie & & Ice Age\\
+        How to Train Your Dragon 2 & Fantastic Mr. Fox & & Kung Fu Panda\\
+        \bottomrule
+    \end{tabularx}
+    \caption{Recomendaciones para \textit{Toy Story 2}}
+\end{table}
+
+\rowcolors{2}{gray!25}{white}
+\begin{table}
+    \begin{tabularx}{\textwidth}{XXXX}
+        \toprule
+        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \midrule
+        \textbf{Castle in the Sky} & \textbf{The Secret World of Arrietty} & La sirenita 2 & Kiki's Delivery Service \\
+        Porco Rosso & My Neighbor Totoro & Toy Story 3 & \textbf{The Secret World of Arrietty}\\
+        Howl's Moving Castle & \textbf{Castle in the Sky} & Finding Nemo & \textbf{Castle in the Sky}\\
+        \textbf{Spirited Away} & \textbf{Spirited Away} & \textbf{The Secret World of Arrietty} & My Neighbor Totoro\\
+        My Neighbor Totoro & Howl's Moving Castle & El niño y la bestia & Howl's Moving Castle\\
+        Princess Mononoke & Kubo and the Two Strings & Regal academy & \textbf{Spirited Away}\\
+        Finding Nemo & Princess Mononoke & & From Up on Poppy Hill\\
+        Kubo and the Two Strings & Susurros del corazón & & Susurros del corazón\\
+        Moana & How to Train Your Dragon & & Haru en el reino de los gatos\\
+        Shrek & Moana & & Pom Poko\\
+        \bottomrule
+    \end{tabularx}
+    \caption{Recomendaciones para \textit{Ponyo}}
+\end{table}
+
+\rowcolors{2}{gray!25}{white}
+\begin{table}
+    \begin{tabularx}{\textwidth}{XXXX}
+        \toprule
+        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \midrule
+        The Wicker Man & The Haunting & Fear of the Walking Dead & 1408\\
+        Halloween & Repulsion & El orfanato & Dark Water\\
+        The Cabinet of Dr. Caligari & What Ever Happened to Baby Jane? & La bruja & The Ring\\
+        Shutter Island & The Exorcist & Cube & The Amityville Horror\\
+        Get Out & Halloween & El ilusionista & Dream House\\
+        Psycho & Dogville & La mujer de negro & The Awakening\\
+        Saw & Rosemary's Baby & & Silent Hill\\
+        What Ever Happened to Baby Jane? & Coraline & & Sinister\\
+        The Haunting & The Wicker Man & & Whispers\\
+        Dark City & Bailar en la oscuridad & & Insidious\\
+        \bottomrule
+    \end{tabularx}
+    \caption{Recomendaciones para \textit{Los Otros}}
+\end{table}
+
+\rowcolors{2}{gray!25}{white}
+\begin{table}
+    \begin{tabularx}{\textwidth}{XXXX}
+        \toprule
+        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \midrule
+        \textbf{Iron Man} & Kick-Ass & The Flash & \textbf{Guardians of the Galaxy}\\
+        Kick-Ass & Kingsman: The Secret Service & Las Tortugas Ninja & Avengers: Age of Ultron\\
+        The Incredibles & \textbf{Guardians of the Galaxy} & Powers & \textbf{Captain America: Civil War}\\
+        \textbf{Captain America: Civil War} & Big Hero 6 & Batman v Superman & The Avengers\\
+        Watchmen & Logan & \textbf{Guardians of the Galaxy} & Doctor Strange\\
+        Logan & Batman Begins & Marvel Los Vengadores Unidos & \textbf{Iron Man}\\
+        Batman & Guardians of the Galaxy Vol. 2 & & Captain America: The Winter Soldier\\
+        X-Men: First Class & John Wick: Chapter 2 & & Ant-Man\\
+        The Dark Knight & Kung Fu Hustle & & Rogue One\\
+        Wonder Woman & Lock, Stock and Two Smoking Barrels & & Batman v Superman: Dawn of Justice\\
+        \bottomrule
+    \end{tabularx}
+    \caption{Recomendaciones para \textit{Deadpool}}
+\end{table}
+
+\chapter{Interfaz}
+Una vez terminado la optimización de los modelos se pasó a programar tanto la interfaz desde donde el usuario interactúa con la herramienta (al que he llamado Movie Pepper), como el backend desde donde consultar los modelos creados.
+
+El backend está escrito en Python\index{Python} y el front en Javascript\index{Javascript} (\acrshort{es6}). Estos dos lenguajes usan un tipado dinámico, pero usando mypy y Flow se pueden tipar estática y opcionalmente. Esto significa que contamos con más seguridad ante errores de programación.
+
+El frontend está construido como \acrshort{spa} usando VueJS 2 y usando Nuxt para tener \acrshort{ssr}. Cuando el usuario entre en la web se envía la página ya renderizada por el servidor, como en una web tradicional, mientras que en paralelo se descarga el resto de la aplicación Javascript\index{Javascript}, con la que seguirá con la navegación.
+
+La web ofrece una funcionalidad muy sencilla. Cada página tiene 100 películas en orden alfabético, pudiendo cambiar de paginas usando los botones al final de la página. Cada película se presenta en una ficha donde se muestra su titulo, géneros, año, puntuación y carátula. Cada ficha tiene tres botones. El primero abre la película en IMDb\index{IMDb}. El segundo pide al recomendador las recomendaciones de la película usando \acrshort{lsa}\index{LSA}. El tercer botón muestras las recomendaciones usando Doc2Vec\index{Doc2Vec}.
+
+Las recomendaciones se presentan encima de la lista de películas con el mismo formato de fichas, pero solamente con el botón de IMDb\index{IMDb}.
+
+También se incluye un buscados básico para filtrar películas por título. Las fichas se filtran en tiempo real mientras el usuario este escribiendo en la barra de búsqueda.
+
+En la figura~\ref{arch} se muestra la arquitectura de la aplicación. La \acrshort{api} \acrshort{rest} solamente tiene tres rutas, una para enumerar las películas disponibles, otra para pedir recomendaciones usando \acrshort{lsa}\index{LSA} y otra para las recomendaciones usando Doc2Vec\index{Doc2Vec}.
+
+
+\begin{figure}
+    \includegraphics[width=0.7\textwidth]{./figures/int.png}
+    \caption{Interfaz de la aplicación}
+\end{figure}
+\begin{figure}
+    \includegraphics[width=0.7\textwidth]{./figures/int_search.png}
+    \caption{Interfaz al buscar}
+\end{figure}
+\begin{figure}
+    \includegraphics[width=0.7\textwidth]{./figures/int_res.png}
+    \caption{Interfaz al mostrar unos resultados}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{tikzpicture}[node distance=2cm]
+        \node (moviepepper) [process] {Movie Pepper};
+        \node (rest) [process, below of=moviepepper] {REST API};
+        \node (movies) [process, right of=moviepepper, xshift=2cm] {/movies};
+        \node (lsarec) [process, below of=movies] {/recommend/title};
+        \node (d2vrec) [process, below of=lsarec] {/recommend-d2v/title};
+        \node (lsamodel) [process, right of=lsarec, xshift=2cm] {\acrshort{lsa}\index{LSA} model};
+        \node (d2vmodel) [process, below of=lsamodel] {Doc2Vec model};
+        \node (database) [database, right of=movies, xshift=2cm] {Movie store};
+        \node (crawl) [process, above of=database] {IMDb crawler};
+
+        \begin{scope}[on background layer]
+            \node (bbox) [rectangle,draw,minimum width=2cm] [fit = (movies) (lsarec) (d2vrec),fill=yellow!30,label=above:Endpoints] {};
+        \end{scope}
+
+        \draw [arrow] (moviepepper) -- (rest);
+        \draw [line] (rest.east) -- (bbox);
+        \draw [line] (movies) -- (database);
+        \draw [line] (lsarec) -- (lsamodel);
+        \draw [line] (d2vrec) -- (d2vmodel);
+        \draw [line] (crawl) -- (database);
+        \draw [line] (database.east) to [bend left] (lsamodel.east);
+        \draw [line] (database.east) to [bend left=50] node[anchor=west] {entrenamiento} (d2vmodel.east);
+    \end{tikzpicture}
+    \caption{Arquitectura del sistema}\label{arch}
+\end{figure}
+
+\chapter{Conclusión}
+Completar este proyecto me ha dado una nueva perspectiva en el potencial del procesamiento del lenguaje natural. Modelos como los usados aquí demuestran que es posible para una máquina extraer suficiente información de textos para que se puedan usar en varias aplicaciones.
+
+Estoy más que satisfecho de los resultados que se muestran aquí, pudiendo competir fácilmente con recomendadores usados en servicios comerciales o servicios que llevan operando durante varios años en la industria.
+
+Son herramientas útiles, con un impacto real en los usuarios de los servicios ya que mejora la experiencia y usabilidad. Sin duda, el filtrado colaborativo es una técnica indispensable a la hora de desplegar un servicio de este estilo, pero pienso que estas técnicas son un buen complemento a las recomendaciones personalizadas. Se puede usar para recomendar al terminar de ver contenidos, para nuevos usuarios que aún no han usado la plataforma lo suficiente como para poder hacer recomendaciones personalizadas de manera robusta o incluso son una buena alternativa para usuarios que desean que se respeta su privacidad.
+
+También estoy muy contento del trabajo realizado en el E-Modelo\index{E-Modelo}. Aunque no se haya podido mostrar aquí creo que tiene una potencia enorme, ya que añade toda una nueva dimensión al filtrado colaborativo clásico. Una de las causas de que sus resultados no me hayan convencido como para incluirlo es posiblemente que necesite más una cantidad de datos más grande que los que estaba usando (alrededor de 100.000 textos).
+
+Creo que otro aspecto importante es que el código sea libre para que otras personas puedan probarlo y extenderlo. Por ahora no es posible compartir el código del E-Modelo\index{E-Modelo}, pero es posible que en el futuro sea publicado por el grupo de Big Data Lab de la UEM\@.
+
+\section{Mejoras}
+Este proyecto se podría ampliar para incluir otros algoritmos de recomendación basados en distintas técnicas como \acrshort{lda}, cadenas de Markov o clustering. La interfaz podría ser más pulida y ofrecer más información sobre las recomendaciones. Faltan tests unitarios y la habilidad de agregar contenidos fácilmente con el crawler. Las recomendaciones se hacen en tiempo real y no se incluye ningún tipo de cache. Precalcular las recomendaciones o usar algún sistema de cacheado como Service Workers o Redis sería conveniente.
+
+Por supuesto el modelo tiene amplio margen de mejora, ya que algunos resultados son un tanto extraños. También sería una buena opción poder ajustar los parámetros desde la página web. Esto supondría un nivel de complejidad en la arquitectura más alto, ya que el proceso de entrenamiento lleva unos minutos y consume todos los recursos disponibles de la máquina donde se ejecuta. Además habría que guardar cada modelo por separado para evitar recalcular modelos ya entrenados, pero no ocupan poco espacio, y la máquina donde se ejecutan tiene un cantidad muy limitada (20 GB) de espacio de disco.
+
+% Bibliography:
+\nocite{*}
+\printbibliography{}
+
+\listoffigures
+\listoftables
+
+% Index
+\printthesisindex{}
+
+\end{document}

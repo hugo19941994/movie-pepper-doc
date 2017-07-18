@@ -1,0 +1,95 @@
+% This file was created by matplotlib2tikz v0.6.11.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0,0.833333333333333,1}
+\definecolor{color1}{rgb}{1,0.901234567901234,0}
+
+\begin{axis}[
+xlabel={Películas},
+ylabel={Posición de la recomendación},
+xmin=-0.248779429241788, xmax=4.34855611461577,
+ymin=0, ymax=10.5849330357143,
+width=\figurewidth,
+height=\figureheight,
+xtick={0,1,2,3,4},
+xticklabels={Saving Private.,Full Metal.,Platoon,The Deer Hunter,Paths of Glory},
+tick align=outside,
+xticklabel style = {rotate=45},
+tick pos=left,
+x grid style={lightgray!92.026143790849673!black},
+y grid style={lightgray!92.026143790849673!black},
+legend entries={{size 1000 window 3 minc 5 iter 10 tot 21},{size 1000 window 5 minc 5 iter 10 tot 19},{size 1000 window 8 minc 5 iter 10 tot 20},{size 1000 window 10 minc 5 iter 10 tot 26}},
+legend cell align={left},
+legend style={at={(0.03,0.97)}, anchor=north west, draw=white!80.0!black}
+]
+\addplot [only marks, draw=blue!50.0!black, fill=blue!50.0!black, colormap/viridis]
+table{%
+x                      y
+-1.561608340662048e-02 +3.000000000000000e+00
++1.003665089608013e+00 +0.000000000000000e+00
++2.009307730171247e+00 +2.000000000000000e+00
++3.006187553582918e+00 +9.000000000000000e+00
++4.003097870937568e+00 +7.000000000000000e+00
+};
+\addplot [only marks, draw=color0, fill=color0, colormap/viridis]
+table{%
+x                      y
+-4.179225575674087e-03 +1.000000000000000e+00
++1.010112721679326e+00 +5.000000000000000e+00
++1.986511139295239e+00 +2.000000000000000e+00
++3.017916601213269e+00 +3.000000000000000e+00
++3.973018796315184e+00 +8.000000000000000e+00
+};
+\addplot [only marks, draw=color1, fill=color1, colormap/viridis]
+table{%
+x                      y
++7.306963403913465e-02 +1.000000000000000e+00
++1.007198285956633e+00 +3.000000000000000e+00
++2.073274399901223e+00 +6.000000000000000e+00
++3.029562513432524e+00 +2.000000000000000e+00
++4.112526975496956e+00 +8.000000000000000e+00
+};
+\addplot [only marks, draw=red!50.0!black, fill=red!50.0!black, colormap/viridis]
+table{%
+x                      y
++1.866219923395850e-02 +5.000000000000000e+00
++9.975030550275386e-01 +3.000000000000000e+00
++2.056906041999223e+00 +6.000000000000000e+00
++2.971712260062434e+00 +2.000000000000000e+00
++3.983171678877306e+00 +1.000000000000000e+01
+};
+\addplot [semithick, blue!50.0!black, opacity=0.5, forget plot]
+table {%
+0 0.800000000000001
+1 2.5
+2 4.2
+3 5.9
+4 7.6
+};
+\addplot [semithick, color0, opacity=0.5, forget plot]
+table {%
+0 1.4
+1 2.6
+2 3.8
+3 5
+4 6.2
+};
+\addplot [semithick, color1, opacity=0.5, forget plot]
+table {%
+0 1.4
+1 2.7
+2 4
+3 5.3
+4 6.6
+};
+\addplot [semithick, red!50.0!black, opacity=0.5, forget plot]
+table {%
+0 3.4
+1 4.3
+2 5.2
+3 6.1
+4 7
+};
+\end{axis}
+
+\end{tikzpicture}

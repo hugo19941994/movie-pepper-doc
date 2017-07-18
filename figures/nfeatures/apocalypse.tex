@@ -1,0 +1,77 @@
+% This file was created by matplotlib2tikz v0.6.11.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0.483870967741935,1,0.483870967741936}
+
+\begin{axis}[
+xlabel={Películas},
+ylabel={Posición de la recomendación},
+xmin=-0.283491355170685, xmax=4.30364514661012,
+ymin=0, ymax=193.708522727273,
+width=\figurewidth,
+height=\figureheight,
+xtick={0,1,2,3,4},
+xticklabels={Paths of.,Full Metal.,Saving.,Platoon,The Deer.},
+tick align=outside,
+xticklabel style = {rotate=45},
+tick pos=left,
+x grid style={lightgray!92.026143790849673!black},
+y grid style={lightgray!92.026143790849673!black},
+legend entries={{feat 2000 cmpn 1000 mndf 5 mxdf 100 keyw 0\% lsa 100\% tot 233},{feat 5000 cmpn 1000 mndf 5 mxdf 100 keyw 0\% lsa 100\% tot 35},{feat None cmpn 1000 mndf 5 mxdf 100 keyw 0\% lsa 100\% tot 37}},
+legend style={at={(0.03,0.97)}, anchor=north west, draw=white!80.0!black},
+legend cell align={left}
+]
+\addplot [only marks, draw=blue!50.0!black, fill=blue!50.0!black, colormap/viridis]
+table{%
+x                      y
+-1.094770710767571e-02 +2.000000000000000e+00
++1.017468476072540e+00 +7.000000000000000e+00
++1.995186422591863e+00 +8.000000000000000e+00
++3.013100378141341e+00 +3.300000000000000e+01
++4.070945393596619e+00 +1.830000000000000e+02
+};
+\addplot [only marks, draw=color0, fill=color0, colormap/viridis]
+table{%
+x                      y
+-4.750546374654548e-02 +2.000000000000000e+00
++9.887907166319483e-01 +1.000000000000000e+00
++1.986315358609423e+00 +1.100000000000000e+01
++2.952746135679334e+00 +0.000000000000000e+00
++4.021598538543233e+00 +2.100000000000000e+01
+};
+\addplot [only marks, draw=red!50.0!black, fill=red!50.0!black, colormap/viridis]
+table{%
+x                      y
+-4.452508350133422e-02 +2.000000000000000e+00
++1.030268324831481e+00 +1.000000000000000e+00
++2.077366621053750e+00 +1.100000000000000e+01
++2.948765299131759e+00 +0.000000000000000e+00
++3.965898891581123e+00 +2.300000000000000e+01
+};
+\addplot [semithick, blue!50.0!black, opacity=0.5, forget plot]
+table {%
+0 -31
+1 7.80000000000003
+2 46.6
+3 85.4
+4 124.2
+};
+\addplot [semithick, color0, opacity=0.5, forget plot]
+table {%
+0 -0.399999999999998
+1 3.3
+2 7
+3 10.7
+4 14.4
+};
+\addplot [semithick, red!50.0!black, opacity=0.5, forget plot]
+table {%
+0 -0.8
+1 3.3
+2 7.4
+3 11.5
+4 15.6
+};
+\end{axis}
+
+\end{tikzpicture}

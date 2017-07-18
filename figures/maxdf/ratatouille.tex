@@ -1,0 +1,103 @@
+% This file was created by matplotlib2tikz v0.6.11.
+\begin{tikzpicture}
+
+\definecolor{color0}{rgb}{0,0.833333333333333,1}
+\definecolor{color1}{rgb}{1,0.901234567901234,0}
+
+\begin{axis}[
+xlabel={Películas},
+ylabel={Posición de la recomendación},
+xmin=-0.29385621355134, xmax=5.3615534292556,
+ymin=0, ymax=561.260717667749,
+width=\figurewidth,
+height=\figureheight,
+xtick={0,1,2,3,4,5},
+xticklabels={The Incredibles,Monsters\, Inc.,Shrek,Ponyo,Toy Story 2,Totoro},
+tick align=outside,
+xticklabel style = {rotate=45},
+tick pos=left,
+x grid style={lightgray!92.026143790849673!black},
+y grid style={lightgray!92.026143790849673!black},
+legend cell align={left},
+legend entries={{feat None cmpn 1000 mndf 5 mxdf 10 keyw 0\% lsa 100\% tot 1382},{feat None cmpn 1000 mndf 5 mxdf 50 keyw 0\% lsa 100\% tot 941},{feat None cmpn 1000 mndf 5 mxdf 100 keyw 0\% lsa 100\% tot 504},{feat None cmpn 1000 mndf 5 mxdf 300 keyw 0\% lsa 100\% tot 200}},
+legend style={at={(0.03,0.97)}, anchor=north west, draw=white!80.0!black}
+]
+\addplot [only marks, draw=blue!50.0!black, fill=blue!50.0!black, colormap/viridis]
+table{%
+x                      y
++5.658183438272429e-02 +4.100000000000000e+01
++9.626340882577124e-01 +1.000000000000000e+02
++2.034364113441558e+00 +2.870000000000000e+02
++3.006153722075286e+00 +3.700000000000000e+02
++3.945113785765690e+00 +3.110000000000000e+02
++4.963326903532982e+00 +2.730000000000000e+02
+};
+\addplot [only marks, draw=color0, fill=color0, colormap/viridis]
+table{%
+x                      y
++9.141336593848364e-04 +2.000000000000000e+01
++1.027773163138102e+00 +4.000000000000000e+00
++2.017488136551779e+00 +6.500000000000000e+01
++3.049069684096833e+00 +9.100000000000000e+01
++4.096814139318210e+00 +2.330000000000000e+02
++5.071223225550303e+00 +5.280000000000000e+02
+};
+\addplot [only marks, draw=color1, fill=color1, colormap/viridis]
+table{%
+x                      y
++9.270744441497033e-03 +1.300000000000000e+01
++9.546491378855511e-01 +5.000000000000000e+00
++1.936798188014879e+00 +2.000000000000000e+00
++3.031764052516728e+00 +1.400000000000000e+01
++4.034129901821994e+00 +1.580000000000000e+02
++5.047156736082320e+00 +3.120000000000000e+02
+};
+\addplot [only marks, draw=red!50.0!black, fill=red!50.0!black, colormap/viridis]
+table{%
+x                      y
+-2.615573445126293e-03 +3.900000000000000e+01
++9.084108574746885e-01 +3.100000000000000e+01
++1.951069995380610e+00 +2.400000000000000e+01
++2.984338222644114e+00 +2.700000000000000e+01
++3.976197688903599e+00 +5.600000000000000e+01
++5.026600080802026e+00 +2.300000000000000e+01
+};
+\addplot [semithick, blue!50.0!black, opacity=0.5, forget plot]
+table {%
+0 96.3333333333333
+1 149.933333333333
+2 203.533333333333
+3 257.133333333333
+4 310.733333333333
+5 364.333333333333
+};
+\addplot [semithick, color0, opacity=0.5, forget plot]
+table {%
+0 -75.5238095238095
+1 17.4190476190476
+2 110.361904761905
+3 203.304761904762
+4 296.247619047619
+5 389.190476190476
+};
+\addplot [semithick, color1, opacity=0.5, forget plot]
+table {%
+0 -56.4285714285714
+1 -0.257142857142867
+2 55.9142857142857
+3 112.085714285714
+4 168.257142857143
+5 224.428571428571
+};
+\addplot [semithick, red!50.0!black, opacity=0.5, forget plot]
+table {%
+0 33.4761904761905
+1 33.4190476190476
+2 33.3619047619047
+3 33.3047619047619
+4 33.247619047619
+5 33.1904761904762
+};
+\end{axis}
+
+\end{tikzpicture}
