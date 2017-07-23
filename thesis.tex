@@ -503,7 +503,7 @@ El código para realizar la matriz \acrshort{tfidf} se basa en la implementació
 \section{Descomposición en valores singulares}
 Con \acrfull{svd}\index{SVD} reducimos la dimensionalidad de la matriz calculada con \acrshort{tfidf}\index{TF-IDF}. Esto acelera de una manera muy significativa los cálculos y además soluciona el problema de la polisemia. Existen varias formas de calcular el \acrshort{svd}\index{SVD}, pero scikit-learn implementa el algoritmo descrito en \citetitle{2009arXiv0909.4061H}
 
-\acrshort{svd}\index{SVD} busca descomponer una matriz natural en 3 matrices diferentes diferentes. A representa la matriz de documentos donde cada file representa los diferentes términos y las columnas representan los diferentes documentos.\cite{stanford-svd}
+\acrshort{svd}\index{SVD} busca descomponer una matriz natural en 3 matrices diferentes diferentes. A representa la matriz de documentos donde cada fila representa los diferentes términos y las columnas representan los diferentes documentos.\cite{stanford-svd}
 
 \begin{figure}[!htbp]
     \centering
@@ -737,7 +737,7 @@ Siguiendo con el ejemplo anterior:
 \chapter{Doc2Vec}\index{Word2Vec}\index{Doc2Vec}
 Word2Vec\cite{DBLP:journals/corr/abs-1301-3781}\index{Word2Vec} es un algoritmo de tipo \Gls{word-embedding} creado por Google en 2013. Doc2Vec\index{Doc2Vec} es es un algoritmo que se basa en Word2Vec\index{Word2Vec} pero trabajando sobre múltiples documentos para así tener vectores de párrafo en vez de vectores de palabras. Fue desarrollado en 2014 por los mismos investigadores de Google\cite{DBLP:journals/corr/LeM14}, aunque no lo llamaron Doc2Vec\index{Doc2Vec} (así se llama la implementación en Gensim\cite{rehurek_lrec}).
 
-Este algoritmo se va a usar para tratar de descubrir que películas tienen más relación entre sí y así poder crear otro modelo de recomendación similar al creado en el capítulo \autoref{chap:lsa}.
+Este algoritmo se va a usar para tratar de descubrir que películas tienen más relación entre sí y así poder crear otro modelo de recomendación similar al creado en el \autoref{chap:lsa}.
 
 Para explicar el funcionamiento de Doc2Vec\index{Doc2Vec} es esencial hablar antes de Word2Vec\index{Word2Vec}.
 
@@ -1349,7 +1349,7 @@ La web ofrece una funcionalidad muy sencilla. Cada página tiene 100 películas 
 
 Las recomendaciones se presentan encima de la lista de películas con el mismo formato de fichas, pero solamente con el botón de IMDb\index{IMDb}.
 
-También se incluye un buscados básico para filtrar películas por título. Las fichas se filtran en tiempo real mientras el usuario este escribiendo en la barra de búsqueda.
+También se incluye un buscador básico para filtrar películas por título. Las fichas se filtran en tiempo real mientras el usuario este escribiendo en la barra de búsqueda.
 
 En la figura~\ref{arch} se muestra la arquitectura de la aplicación. La \acrshort{api} \acrshort{rest} solamente tiene tres rutas, una para enumerar las películas disponibles, otra para pedir recomendaciones usando \acrshort{lsa}\index{LSA} y otra para las recomendaciones usando Doc2Vec\index{Doc2Vec}.
 
