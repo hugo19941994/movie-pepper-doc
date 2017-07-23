@@ -1,0 +1,244 @@
+\documentclass{beamer}
+
+\usepackage[spanish]{babel}
+%\usepackage[utf8]{inputenc}
+\usepackage{pgfgantt}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, fit, backgrounds, positioning, matrix, decorations.pathreplacing, calc}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!50]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!20]
+\tikzstyle{database} = [cylinder, minimum width=3cm, minimum height=2cm, text centered, shape border rotate=90, aspect=0.25, draw=black, fill=yellow!30]
+\tikzstyle{arrow} = [thick, ->, >=stealth]
+\tikzstyle{line} = [-Latex]
+
+\newcommand{\inline}[2]{%
+    \begin{tikzpicture}[baseline=(word.base), txt/.style={shape=rectangle, inner sep=0pt}]
+        \node[txt] (word) {\texttt{#1}};
+        \node[above] at (word.north) {\footnotesize{#2}};
+    \end{tikzpicture}%
+}
+
+\usetheme{metropolis}
+
+\title{Estudio sobre Sistemas de Recomendación y Predicción basados en el procesamiento del lenguaje natural}
+\date{\today}
+\author{Hugo Ferrando Seage}
+\institute{Universidad Europea de madrid\\Escuela de Arquitectura, Ingeniería y Diseño}
+
+\begin{document}
+  \maketitle
+
+  \section{Introducción}
+  \begin{frame}{Introducción}
+      Los recomendadores son una parte esencial de cualquier servicio de Video on Demand (VOD). Tanto Netflix como Movistar+, Amazon Hulu y HBO cuentan con sus propios sistemas.
+
+      También existen webs que usan sus recomendadores como IMDb o FilmAffinity. Incluso existen servicios comerciales que se dedican a productivizar su sistema de recomendación, como Jinni.
+  \end{frame}
+
+  \begin{frame}{Introducción}
+      Existen tres grandes tipos de sistemas de recomendación:
+      \begin{itemize}
+          \item Filtrado Colaborativo
+          \item Filtrado por contenido
+          \item Sistemas híbridos
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Filtrado Colaborativo}
+      Consiste en emparejar usuarios que tengan gustos similares y recomendar en base a esos datos.
+
+      Normalmente se representa usando una matriz bidimensional donde las filas representan usuarios y la columnas representan productos.
+
+      Los usuarios deben puntuar los contenidos, o se pueden usar otras metricas.
+  \end{frame}
+
+  \begin{frame}{Filtrado por Contenido}
+      Consiste en la creación de un modelo que determina la similitud entre productos en base a algún criterio.
+
+      Ese criterio puede ser cualquier elemento del producto. Para películas puede ser el género. Para restaurantes el tipo de cocina. Etc.
+  \end{frame}
+
+  \begin{frame}{Filtrado Híbrido}
+      Usan una combinación de ambas técnicas para complementar las recomendaciones.
+  \end{frame}
+
+  \section{Objetivos}
+  \begin{frame}{Objetivos}
+      \begin{itemize}
+          \item Contruir un recomendador de películas
+          \item Crear el modelo en base a tres algoritmos
+              \begin{itemize}
+                  \item LSA
+                  \item Doc2Vec
+                  \item E-Modelo
+              \end{itemize}
+          \item Comparar y optimizar modelos
+          \item Crear una interfáz desde donde poder probarlos
+      \end{itemize}
+  \end{frame}
+
+  \section{Metodología}
+  \begin{frame}{Metodología}
+      La metodología usada ha sido ágil, basada en MVPs.
+
+      \begin{figure}[!htbp]
+          \resizebox{0.45\textwidth}{!}{
+              \centering
+              \begin{ganttchart}[
+                  hgrid,
+                  vgrid,
+                  time slot format=isodate-yearmonth,
+                  compress calendar
+                  ]{2016-9}{2017-7}
+                  \setganttlinklabel{f-s}{}
+
+                  \gantttitlecalendar{year, month} \\
+                  \ganttbar{Investigación}{2016-09}{2016-11} \\
+                  \ganttbar{Doc2Vec}{2017-03}{2017-03} \\
+                  \ganttbar{LSA MVP1}{2016-10}{2016-11} \\
+                  \ganttbar{LSA MVP2}{2016-12}{2017-01} \\
+                  \ganttbar{LSA MVP3}{2017-02}{2017-03} \\
+                  \ganttbar{ALS MVP1}{2016-09}{2016-12} \\
+                  \ganttbar{ALS MVP2}{2017-01}{2017-02} \\
+                  \ganttbar{ALS MVP3}{2017-03}{2017-03} \\
+                  \ganttbar{Desarrollo Interfaz}{2017-04}{2017-05} \\
+                  \ganttmilestone{Fin Desarrollo}{2017-05} \\
+                  \ganttbar{Documentación}{2017-05}{2017-06} \\
+                  \ganttmilestone{Entrega \& Presentación}{2017-06}{2017-06}
+
+                  \ganttlink{elem0}{elem1}
+                  \ganttlink{elem0}{elem2}
+
+                  \ganttlink[link type=f-s]{elem2}{elem3}
+                  \ganttlink[link type=f-s]{elem3}{elem4}
+
+                  \ganttlink[link type=f-s]{elem5}{elem6}
+                  \ganttlink[link type=f-s]{elem6}{elem7}
+
+                  \ganttlink[link type=f-s]{elem1}{elem8}
+                  \ganttlink[link type=f-s]{elem4}{elem8}
+                  \ganttlink[link type=f-s]{elem7}{elem8}
+
+                  \ganttlink{elem8}{elem9}
+                  \ganttlink{elem10}{elem11}
+              \end{ganttchart}
+          }
+      \end{figure}
+
+  \end{frame}
+
+  \section{Descarga de datos}
+  \begin{frame}{Descarga de datos}
+      Para entrenar los modelos es necesario obtener una gran cantidad de textos. Para ello se ha creado un crawler usando Spidy, que descarga información y críticas de las top 1000 películas de IMDb.
+  \end{frame}
+  \begin{frame}{Descarga de datos}
+      \begin{figure}[!htbp]
+          \resizebox{0.45\textwidth}{!}{
+              \begin{tikzpicture}[node distance=2cm]
+                  \centering
+                  \node (init) [startstop] {Top 1000 IMDb};
+                  \node (link1) [decision, below of=init] {URL};
+                  \node (pelicula-init) [startstop, below of=link1] {Película};
+                  \node (link2) [decision, below of=pelicula-init, yshift=-2cm] {URL};
+                  \node (keywords) [process, right of=link2, xshift=2cm] {Palabras clave};
+                  \node (info) [process, above of=keywords] {Información};
+                  \node (reviews) [startstop, below of=link2] {Críticas};
+                  \node (link3) [decision, below of=reviews] {URL};
+                  \node (reviews-1) [process, right of=reviews, xshift=2cm] {Crítica};
+                  \node (database) [database, right of=link1, xshift=3cm] {BD};
+                  \begin{scope}[on background layer]
+                      \node (bbox) [rectangle,draw,minimum width=2cm] [fit = (info) (keywords) (reviews-1),fill=yellow!30,label=above:Película] {};
+                  \end{scope}
+
+                  \draw [line] (init) -- (link1);
+                  \draw [line] (link1) to [bend left] node[anchor=east] {página} (init);
+                  \draw [line] (link1) -- node[anchor=north] {¿visitado?} (database);
+                  \draw [line] (database) |- node[anchor=west] {no} (pelicula-init);
+                  \draw [line] (pelicula-init) -- (link2);
+                  \draw [line] (pelicula-init) |- (info);
+                  \draw [line] (link2) -- (keywords);
+                  \draw [line] (link2) -- (reviews);
+                  \draw [line] (reviews) -- (link3);
+                  \draw [line] (link3) to [bend left] node[anchor=east] {página} (reviews);
+                  \draw [line] (link3) -| (reviews-1);
+              \end{tikzpicture}
+          }
+      \end{figure}
+  \end{frame}
+
+  \section{Limpieza de textos}
+  \begin{frame}{Limpieza de textos}
+      Antes de crear los modelos es necesario hacer un pretratado de los textos.
+  \end{frame}
+  \begin{frame}[fragile]{Ejemplo}
+      \begin{verbatim}
+          Zeus is a Greek God.
+      \end{verbatim}
+  \end{frame}
+  \begin{frame}[fragile]{POS Tagger}
+      \begin{figure}[!htbp]
+          \centering
+          \inline{Zeus}{NNP} \inline{is}{VBZ} \inline{a}{DT} \inline{Greek}{NN} \inline{God}{NNP}.
+      \end{figure}
+  \end{frame}
+  \begin{frame}[fragile]{Hiperónimos}
+      \begin{verbatim}
+          Zeus is a country deity.
+      \end{verbatim}
+  \end{frame}
+  \begin{frame}[fragile]{Nombres propios}
+      Es necesario eliminar los nombres propios para que no se relacionen películas con personajes que tienen el mismo nombre.
+      \begin{verbatim}
+          is a country deity.
+      \end{verbatim}
+  \end{frame}
+  \begin{frame}[fragile]{Stopwords}
+      \begin{verbatim}
+          country deity
+      \end{verbatim}
+  \end{frame}
+  \begin{frame}[fragile]{Stemmer}
+      \begin{verbatim}
+          counti deiti
+      \end{verbatim}
+  \end{frame}
+
+  \section{LSA}
+  \begin{frame}{LSA}
+      Latent Semantic Analysis trata de extraer conceptos de cada texto y analizar la relación entre documentos.
+  \end{frame}
+  \begin{frame}[fragile]{TF-IDF}
+      Term Frequency-Inverse Document Frequency calcula lo relevante que es cada palabra del vocabulario dentro de cada texto.
+
+      \begin{figure}[!htbp]
+          \centering
+          \[tfidf =
+              \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+                  \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                      0.39&0.16&0.19&0.01&0.25&0.79&0.27 \\
+                      0.12&0.12&0.06&0.46&0.21&0.07&0.83 \\
+                      0.46&0.55&0.15&0.55&0.22&0.27&0.11 \\
+                      0.00&0.60&0.51&0.00&0.00&0.60&0.00 \\
+                      0.41&0.00&0.35&0.83&0.00&0.00&0.00 \\
+                  };
+                  \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {says};
+                  \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {just};
+                  \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {room};
+                  \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {dead};
+                  \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {asks};
+                  \node[above=10pt of m-1-6, rotate=45, yshift=3mm, xshift=3mm] (top-6) {ship};
+                  \node[above=10pt of m-1-7, rotate=45, yshift=3mm, xshift=3mm] (top-7) {mother};
+
+                  \node[left=12pt of m-1-1] (left-1) {The Matrix};
+                  \node[left=12pt of m-2-1] (left-2) {Alien};
+                  \node[left=12pt of m-3-1] (left-3) {Serenity};
+                  \node[left=12pt of m-4-1] (left-4) {Casablanca};
+                  \node[left=12pt of m-5-1] (left-5) {Amelie};
+              \end{tikzpicture}
+          \]
+      \end{figure}
+  \end{frame}
+\end{document}
