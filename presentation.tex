@@ -1,8 +1,13 @@
 \documentclass{beamer}
 
 \usepackage[spanish]{babel}
-%\usepackage[utf8]{inputenc}
+\usepackage[normalem]{ulem}
 \usepackage{pgfgantt}
+\usepackage{booktabs}
+\usepackage{bookmark}
+\usepackage{graphicx}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows.meta, fit, backgrounds, positioning, matrix, decorations.pathreplacing, calc}
@@ -26,7 +31,7 @@
 \title{Estudio sobre Sistemas de Recomendación y Predicción basados en el procesamiento del lenguaje natural}
 \date{\today}
 \author{Hugo Ferrando Seage}
-\institute{Universidad Europea de madrid\\Escuela de Arquitectura, Ingeniería y Diseño}
+\institute{Universidad Europea de Madrid\\Escuela de Arquitectura, Ingeniería y Diseño}
 
 \begin{document}
   \maketitle
@@ -212,33 +217,285 @@
   \end{frame}
   \begin{frame}[fragile]{TF-IDF}
       Term Frequency-Inverse Document Frequency calcula lo relevante que es cada palabra del vocabulario dentro de cada texto.
+      \tiny
+      \[tfidf =
+          \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+              \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                  0.39&0.16&0.19&0.01&0.25&0.79&0.27 \\
+                  0.12&0.12&0.06&0.46&0.21&0.07&0.83 \\
+                  0.46&0.55&0.15&0.55&0.22&0.27&0.11 \\
+                  0.00&0.60&0.51&0.00&0.00&0.60&0.00 \\
+                  0.41&0.00&0.35&0.83&0.00&0.00&0.00 \\
+              };
+              \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {says};
+              \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {just};
+              \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {room};
+              \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {dead};
+              \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {asks};
+              \node[above=10pt of m-1-6, rotate=45, yshift=3mm, xshift=3mm] (top-6) {ship};
+              \node[above=10pt of m-1-7, rotate=45, yshift=3mm, xshift=3mm] (top-7) {mother};
+
+              \node[left=12pt of m-1-1] (left-1) {The Matrix};
+              \node[left=12pt of m-2-1] (left-2) {Alien};
+              \node[left=12pt of m-3-1] (left-3) {Serenity};
+              \node[left=12pt of m-4-1] (left-4) {Casablanca};
+              \node[left=12pt of m-5-1] (left-5) {Amelie};
+          \end{tikzpicture}
+      \]
+  \end{frame}
+  \begin{frame}{SVD}
+      El siguiente paso es descomponer la matriz en valores singulares.
+  \end{frame}
+  \begin{frame}[fragile]{SVD}
+      Matriz Palabra-Concepto.
+      \tiny
+      \[
+          U =
+          \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+              \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                  0.13&0.02&-0.01& \\
+                  0.41&0.07&-0.03& \\
+                  0.55&0.09&-0.04& \\
+                  0.68&0.11&-0.05& \\
+                  0.15&-0.59&0.65& \\
+                  0.07&-0.73&0.67& \\
+                  0.07&-0.29&0.32& \\
+              };
+
+              \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=5mm] (top-1) {Sci-Fi topic};
+              \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=5mm] (top-2) {Romance topic};
+              \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=5mm] (top-3) {Ruido};
+
+              \node[left=12pt of m-1-1] (left-1) {action};
+              \node[left=12pt of m-2-1] (left-2) {gun};
+              \node[left=12pt of m-3-1] (left-3) {shoot};
+              \node[left=12pt of m-4-1] (left-4) {run};
+              \node[left=12pt of m-5-1] (left-5) {love};
+              \node[left=12pt of m-6-1] (left-6) {peace};
+              \node[left=12pt of m-7-1] (left-7) {kiss};
+
+          \end{tikzpicture}
+      \]
+  \end{frame}
+  \begin{frame}[fragile]{SVD}
+      Matriz de relevancia de Conceptos.
+      \tiny
+      \[
+          \Sigma =
+          \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+              \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                  12.4&0&0& \\
+                  0&9.5&0& \\
+                  0&0&1.3& \\
+              };
+
+              \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=5mm] (top-1) {Sci-Fi topic};
+              \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=5mm] (top-2) {Romance topic};
+              \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=5mm] (top-3) {Ruido};
+          \end{tikzpicture}
+      \]
+  \end{frame}
+  \begin{frame}[fragile]{SVD}
+      Matriz Película-Concepto.
+      \tiny
+      \[
+          V^T =
+          \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+              \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                  0.56&0.59&0.56&0.09&0.09 \\
+                  0.12&-0.02&0.12&-0.69&-0.69 \\
+                  0.40&-0.80&0.40&0.09&0.09 \\};
+
+              \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {Matrix};
+              \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {Alien};
+              \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {Serenity};
+              \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {Casablanca};
+              \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {Amelie};
+
+              \node[left=12pt of m-1-1] (left-1) {Sci-Fi topic};
+              \node[left=12pt of m-2-1] (left-2) {Romance topic};
+              \node[left=12pt of m-3-1] (left-3) {Ruido};
+
+          \end{tikzpicture}
+      \]
+  \end{frame}
+  \begin{frame}[fragile]{SVD}
+      Los conceptos menos relevantes se pueden eliminar.
+      \tiny
+      \[
+          V^T =
+          \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+              \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+                  0.56&0.59&0.56&0.09&0.09 \\
+                  0.12&-0.02&0.12&-0.69&-0.69 \\};
+
+              \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {Matrix};
+              \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {Alien};
+              \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {Serenity};
+              \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {Casablanca};
+              \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {Amelie};
+
+              \node[left=12pt of m-1-1] (left-1) {Sci-Fi topic};
+              \node[left=12pt of m-2-1] (left-2) {Romance topic};
+
+          \end{tikzpicture}
+      \]
+  \end{frame}
+  \begin{frame}{Similitud Coseno}
+      \begin{figure}[!htbp]
+          \begin{equation}
+              \cos\left(
+                  \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+                      \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {0.56\\0.12\\};
+                  \end{tikzpicture}
+                  ,
+                  \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+                      \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {0.59\\-0.02\\};
+                  \end{tikzpicture}
+              \right) = 0.97
+          \end{equation}
+          \caption{Alta similitud entre Matrix y Alien}
+      \end{figure}
 
       \begin{figure}[!htbp]
-          \centering
-          \[tfidf =
-              \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
-                  \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
-                      0.39&0.16&0.19&0.01&0.25&0.79&0.27 \\
-                      0.12&0.12&0.06&0.46&0.21&0.07&0.83 \\
-                      0.46&0.55&0.15&0.55&0.22&0.27&0.11 \\
-                      0.00&0.60&0.51&0.00&0.00&0.60&0.00 \\
-                      0.41&0.00&0.35&0.83&0.00&0.00&0.00 \\
-                  };
-                  \node[above=10pt of m-1-1, rotate=45, yshift=3mm, xshift=3mm] (top-1) {says};
-                  \node[above=10pt of m-1-2, rotate=45, yshift=3mm, xshift=3mm] (top-2) {just};
-                  \node[above=10pt of m-1-3, rotate=45, yshift=3mm, xshift=3mm] (top-3) {room};
-                  \node[above=10pt of m-1-4, rotate=45, yshift=3mm, xshift=3mm] (top-4) {dead};
-                  \node[above=10pt of m-1-5, rotate=45, yshift=3mm, xshift=3mm] (top-5) {asks};
-                  \node[above=10pt of m-1-6, rotate=45, yshift=3mm, xshift=3mm] (top-6) {ship};
-                  \node[above=10pt of m-1-7, rotate=45, yshift=3mm, xshift=3mm] (top-7) {mother};
-
-                  \node[left=12pt of m-1-1] (left-1) {The Matrix};
-                  \node[left=12pt of m-2-1] (left-2) {Alien};
-                  \node[left=12pt of m-3-1] (left-3) {Serenity};
-                  \node[left=12pt of m-4-1] (left-4) {Casablanca};
-                  \node[left=12pt of m-5-1] (left-5) {Amelie};
-              \end{tikzpicture}
-          \]
+          \begin{equation}
+              \cos\left(
+                  \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+                      \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {0.56\\0.12\\};
+                  \end{tikzpicture}
+                  ,
+                  \begin{tikzpicture}[baseline=-0.65ex,scale=0.8]
+                      \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {0.09\\-0.69\\};
+                  \end{tikzpicture}
+              \right) = -0.08
+          \end{equation}
+          \caption{Baja similitud entre Matrix y Amelie}
       \end{figure}
+  \end{frame}
+
+  \section{Doc2Vec}
+  \begin{frame}{Word2Vec}
+      Word2Vec es un algoritmo creado por Google en 2013. Es conceptualmente similar a LSA, pero teniendo en cuenta cada palabra dentro de su contexto.
+
+      Es decir, calcula la probabilidad de que una palabra esté en la vecindad de otra palabra en el vocabulario.
+  \end{frame}
+  \begin{frame}{Word2Vec}
+      En primer lugar se guardan las parejas de palabras dentro de una ventana.
+      \tiny
+      \begin{table}
+          \centering
+          \begin{tabular}{cp{45mm}}
+              \toprule
+              Source Text & Training Samples \\
+              \midrule
+              \colorbox{blue!20}{\colorbox{red!20}{The} quick brown} fox jumps over the lazy dog & (`the', `quick') \newline (`the', `brown') \\
+              \midrule
+              \colorbox{blue!20}{The \colorbox{red!20}{quick} brown fox} jumps over the lazy dog & (`quick', `the') \newline (`quick', `brown') \newline (`quick', `fox') \\
+              \midrule
+              \colorbox{blue!20}{The quick \colorbox{red!20}{brown} fox jumps} over the lazy dog & (`brown', `the') \newline (`brown', `quick') \newline (`brown', `fox') \newline (`brown', `jumps') \\
+              \midrule
+              The \colorbox{blue!20}{quick brown \colorbox{red!20}{fox} jumps over} the lazy dog & (`fox', `quick') \newline (`fox', `brown') \newline (`fox', `jumps') \newline (`fox', `over') \\
+              \bottomrule
+          \end{tabular}
+          \caption{Ventana deslizante en Word2Vec\index{Word2Vec}}\label{tab:w2v-window}
+      \end{table}
+  \end{frame}
+  \begin{frame}{Word2Vec}
+      Las palabras del vocabulario se convierten a vectores one-hot.
+
+      \begin{table}
+          \centering
+          \begin{tabular}{ccc}
+              \toprule
+              Palabra & Posición por orden alfabético & Vector\\
+              \midrule
+              fox & 2/3 & [0, 1, 0]\\
+              dog & 1/3 & [1, 0, 0]\\
+              zebra & 3/3 & [0, 0, 1]\\
+              \bottomrule
+          \end{tabular}
+          \caption{Vectores one-hot}
+      \end{table}
+  \end{frame}
+  \begin{frame}{Word2Vec}
+      Con los datos obtenidos se entrena una red neuronal con una capa oculta.
+
+      \centering
+      \includegraphics[scale=0.50]{./figures/skip-gram-exp.png}
+  \end{frame}
+  \begin{frame}{Word2Vec}
+      La capa de input tiene tantas neuronas como palabras en el vocabulario. La función de activación es lineal.
+
+      h tiene tantas neuronas como componentes se quieran extraer.
+
+      La capa output tienen tantos vectores como el numero de componentes de la ventata.
+
+      \centering
+      \includegraphics[scale=0.50]{./figures/skip-gram-exp.png}
+  \end{frame}
+  \begin{frame}{Doc2Vec}
+      Word2Vec trabaja a nivel de palabras. Doc2Vec extiende el algoritmo para hacer comparaciones entre documentos.
+
+      \centering
+      \includegraphics[scale=0.50]{./figures/distributed_bag_of_words.pdf}
+  \end{frame}
+
+  \section{Optimización}
+  \begin{frame}{Optimización}
+      Para cada modelo hay unos parametros que se pueden ajustar.
+  \end{frame}
+  \begin{frame}{Parametros LSA}
+      \begin{itemize}
+          \item Numero de `features'
+          \item Numero de componentes
+          \item Frecuencia Minima de Documentos
+          \item Frecuencia Máxima de Documentos
+      \end{itemize}
+  \end{frame}
+  \begin{frame}{Parametros Doc2Vec}
+      \begin{itemize}
+          \item Size
+          \item Window
+          \item Minimum Word Count
+          \item Iteraciones
+      \end{itemize}
+  \end{frame}
+\newlength\figureheight
+\newlength\figurewidth
+\setlength\figureheight{0.7\linewidth}
+\setlength\figurewidth{\linewidth}
+  \begin{frame}{Optimización LSA}
+      \tiny
+      \centering
+      \input{./figures/nfeatures/apocalypse.tex}
+  \end{frame}
+  \begin{frame}{Optimización LSA}
+      \tiny
+      \centering
+      \input{./figures/nfeatures/space.tex}
+  \end{frame}
+  \begin{frame}{Optimización LSA}
+      \tiny
+      \centering
+      \input{./figures/nfeatures/ratatouille.tex}
+  \end{frame}
+  \begin{frame}{Optimización Doc2Vec}
+      \tiny
+      \centering
+      \input{./figures/iterations/apocalypse.tex}
+  \end{frame}
+  \begin{frame}{Optimización Doc2Vec}
+      \tiny
+      \centering
+      \input{./figures/iterations/space.tex}
+  \end{frame}
+  \begin{frame}{Optimización Doc2Vec}
+      \tiny
+      \centering
+      \input{./figures/iterations/ratatouille.tex}
+  \end{frame}
+  \section{Demo}
+  \begin{frame}{Demo}
+      \url{https://moviepepper.hugofs.com}
   \end{frame}
 \end{document}
