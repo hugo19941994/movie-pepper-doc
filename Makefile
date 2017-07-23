@@ -1,6 +1,6 @@
-.PHONY: thesis all clean
+.PHONY: thesis presentation all clean
 
-all: thesis clean
+all: thesis presentation clean
 
 thesis: thesis.tex
 	pdflatex --shell-escape thesis.tex
@@ -10,14 +10,13 @@ thesis: thesis.tex
 	pdflatex --shell-escape thesis.tex
 	pdflatex --shell-escape thesis.tex
 
+presentation:
+	xelatex presentation.tex
+
 clean:
 	latexmk -c
 	rm -f *~ *.dvi *.log *.bak *.aux *.toc *.ps *.eps *.blg *.bbl
 	rm -f *.glg *.glo *.gls *.idx *.ild *.ind *.ist *.ilg *.iso *.out
-	rm -f *.acn *.acr *.alg
-	rm -f *.xdy
-	rm -f *.pstex *.pstex_t
-	rm -f thesis.run.xml
-	rm -f thesis.bbl
-	rm -f thesis.glsdefs
-	rm -rf _minted-thesis
+	rm -f *.acn *.acr *.alg *.xdy *.vrb *.pstex *.pstex_t *.run.xml
+	rm -f *.bbl *.nav *.snm *.glsdefs
+	rm -rf _minted-*
