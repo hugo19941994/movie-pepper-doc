@@ -53,7 +53,7 @@
   \begin{frame}{Introducción}
       Existen tres grandes tipos de sistemas de recomendación:
       \begin{itemize}
-          \item Filtrado Colaborativo
+          \item Filtrado colaborativo
           \item Filtrado por contenido
           \item Sistemas híbridos
       \end{itemize}
@@ -300,7 +300,7 @@
   \end{frame}
 
   \begin{frame}[fragile]{SVD}
-      Matriz de relevancia de Conceptos.
+      Matriz de relevancia de Conceptos
       \tiny
       \[
           \Sigma =
@@ -319,7 +319,7 @@
   \end{frame}
 
   \begin{frame}[fragile]{SVD}
-      Matriz Película-Concepto.
+      Matriz Película-Concepto
       \tiny
       \[
           V^T =
@@ -344,7 +344,7 @@
   \end{frame}
 
   \begin{frame}[fragile]{SVD}
-      Los conceptos menos relevantes se pueden eliminar.
+      Los conceptos menos relevantes se pueden eliminar
       \tiny
       \[
           V^T =
@@ -452,7 +452,7 @@
   \end{frame}
 
   \begin{frame}{Word2Vec}
-      La capa de input tiene tantas neuronas como palabras en el vocabulario. La función de activación es lineal.
+      El tamaño de la capa de input es igual al número de palabras en el vocabulario. La función de activación es lineal.
 
       \centering
       \includegraphics[scale=0.50]{./figures/skip-gram-exp.png}
@@ -466,7 +466,7 @@
   \end{frame}
 
   \begin{frame}{Word2Vec}
-      La capa output tienen tantos vectores como el número de componentes de la ventana.
+      La capa output tienen el mismo número de vectores que el tamaño de la ventana.
 
       \centering
       \includegraphics[scale=0.50]{./figures/skip-gram-exp.png}
@@ -511,12 +511,8 @@
       Modelo de predicción de tokens hibrido.
 
       Combina el filtrado colaborativo con los features extraidos de un filtrado por contenido.
-  \end{frame}
 
-  \begin{frame}{E-Modelo}
-      En primer lugar extraemos tokens como se ha hecho en el pre-filtrado de textos.
-
-      En este caso se ha usado un servicio comercial llamado Bitext.
+      En primer lugar extraemos tokens como se ha hecho en el pre-filtrado de textos (usando Bitext).
   \end{frame}
 
   \begin{frame}[fragile]{E-Modelo}
