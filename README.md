@@ -1,8 +1,10 @@
 # Movie Pepper Doc
 
-This repo contains documentation about the Movie Pepper Project
+[![Build Status](https://travis-ci.org/hugo19941994/movie-pepper-doc.svg?branch=master)](https://travis-ci.org/hugo19941994/movie-pepper-doc)
 
-To compile it, a modern LaTeX distribution needs to be installed, in addition to Python 3, Pygmentize and make.
+This repo contains documentation about the Movie Pepper Project.
+
+To compile it, a modern LaTeX distribution needs to be installed, in addition to Python, pygments and make.
 
 To compile the presentation XeLaTex is recommended.
 
