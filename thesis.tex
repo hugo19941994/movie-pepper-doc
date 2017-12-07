@@ -170,12 +170,11 @@ Servicios como Netflix\index{Netflix}, Movistar+\index{Movistar+} (figura~\ref{r
 
 \begin{figure}[!htbp]
     \centering
-    \begin{subfigure}[t]{0.4\textwidth}
+    \begin{subfigure}[t]{0.39\textwidth}
         \includegraphics[width=\textwidth]{./figures/rec-movistar.png}
         \caption{Recomendaciones personalizadas en Movistar+\index{Movistar+}}\label{rec-movistar}
     \end{subfigure}
-    ~
-    \begin{subfigure}[t]{0.4\textwidth}
+    \begin{subfigure}[t]{0.39\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./figures/rec-movielense.png}
         \caption{Recomendaciones personalizadas en Movielense}\label{rec-movielense}
@@ -269,22 +268,22 @@ Hay que mencionar que la inspiración para este proyecto fue la realización de 
         vgrid,
         time slot format=isodate-yearmonth,
         compress calendar
-        ]{2016-9}{2017-7}
+        ]{2016-9}{2017-7} %chktex 8
         \setganttlinklabel{f-s}{}
 
         \gantttitlecalendar{year, month} \\
-        \ganttbar{Investigación}{2016-09}{2016-11} \\
-        \ganttbar{Doc2Vec}{2017-03}{2017-03} \\
-        \ganttbar{LSA MVP1}{2016-10}{2016-11} \\
-        \ganttbar{LSA MVP2}{2016-12}{2017-01} \\
-        \ganttbar{LSA MVP3}{2017-02}{2017-03} \\
-        \ganttbar{ALS MVP1}{2016-09}{2016-12} \\
-        \ganttbar{ALS MVP2}{2017-01}{2017-02} \\
-        \ganttbar{ALS MVP3}{2017-03}{2017-03} \\
-        \ganttbar{Desarrollo Interfaz}{2017-04}{2017-05} \\
-        \ganttmilestone{Fin Desarrollo}{2017-05} \\
-        \ganttbar{Documentación}{2017-05}{2017-06} \\
-        \ganttmilestone{Entrega \& Presentación}{2017-06}{2017-06}
+        \ganttbar{Investigación}{2016-09}{2016-11} \\ %chktex 8
+        \ganttbar{Doc2Vec}{2017-03}{2017-03} \\ %chktex 8
+        \ganttbar{LSA MVP1}{2016-10}{2016-11} \\ %chktex 8
+        \ganttbar{LSA MVP2}{2016-12}{2017-01} \\ %chktex 8
+        \ganttbar{LSA MVP3}{2017-02}{2017-03} \\ %chktex 8
+        \ganttbar{ALS MVP1}{2016-09}{2016-12} \\ %chktex 8
+        \ganttbar{ALS MVP2}{2017-01}{2017-02} \\ %chktex 8
+        \ganttbar{ALS MVP3}{2017-03}{2017-03} \\ %chktex 8
+        \ganttbar{Desarrollo Interfaz}{2017-04}{2017-05} \\ %chktex 8
+        \ganttmilestone{Fin Desarrollo}{2017-05} \\ %chktex 8
+        \ganttbar{Documentación}{2017-05}{2017-06} \\ %chktex 8
+        \ganttmilestone{Entrega \& Presentación}{2017-06}{2017-06} %chktex 8
 
         \ganttlink{elem0}{elem1}
         \ganttlink{elem0}{elem2}
@@ -413,8 +412,6 @@ Así el texto se convertirá en:
 En este paso se elimina cualquier token que coincida con los stopwords de la lista inglesa de NLTK\cite{NLTK} y cualquier número. Esta lista incluye palabras muy comunes como `i', `me', `my', `am', `those', `few', etc.
 
 También se eliminan los signos de puntuación y se pasan todas las palabras a minúsculas.
-
-%\inputminted[firstline=115, lastline=132, xleftmargin=21pt, breaklines=true, tabsize=4]{python}{../movie-pepper-back/tfidf_lsa.py}
 
 Nuestro texto anterior ahora se convertirá en:
 \begin{verbatim}
@@ -716,7 +713,6 @@ Siguiendo con el ejemplo anterior:
         \end{tikzpicture}
         \caption{Alta similitud del coseno}\label{cos-high}
     \end{subfigure}
-    ~
     \begin{subfigure}[t]{0.4\textwidth}
         \centering
         \begin{tikzpicture}
@@ -878,9 +874,9 @@ En la tabla~\ref{tab:w2v-res} se pueden ver algunos resultados reales del modelo
 \begin{table}
     \begin{tabularx}{\textwidth}{XXXXXX}
         \toprule
-        \hiderowcolors Palabra clave & \multicolumn{5}{c}{Palabras similares}\\ \showrowcolors
+        \hiderowcolors{}Palabra clave & \multicolumn{5}{c}{Palabras similares}\\
         \midrule
-        \textbf{mafia} & dealer & banker & mob & mexican & drug\\
+        \showrowcolors{}\textbf{mafia} & dealer & banker & mob & mexican & drug\\
         \textbf{axe} & expedition & undercover & biker & employee & outlaw\\
         \textbf{hair} & clothes & coat & eyes & teeth & makeup\\
         \textbf{airplane} & announcer & sanctuary & engine & accident & ambushed\\
@@ -907,7 +903,6 @@ El Distributed Bag of Words Model (figura~\ref{d2v-dbow}) se basa en el modelo S
         \includegraphics[width=\textwidth]{./figures/distributed_memory_model.pdf}
         \caption{Doc2Vec\index{Doc2Vec} Distributed Memory Model}\label{d2v-dmm}
     \end{subfigure}
-    ~
     \begin{subfigure}[t]{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./figures/distributed_bag_of_words.pdf}
@@ -1024,7 +1019,7 @@ Los parámetros son:
 
 El resultado es una matriz donde los -1 que había en la matriz original se han convertido en valores estimados. Esos valores representan con que frecuencia un usuario usará una palabra en una crítica de un producto que no ha comprado. Si usamos palabras que describen gustos, como pueden ser los adjetivos calificativos, se puede distinguir cuando una persona va a estar satisfecho con su compra y cuando no.
 
-Resaltar que en este caso la recomendación vendría dada una vez se realiza la predicción de palabras para un usuario y un producto a través de un consiguiente análisis de dichas palabras (p.ej. de sentimiento). Este modelo ha sido probado en cuanto a su eficiencia en predicción\cite{emodelo} llegando tener una mejor tasa en precisión cercana al 40\%, pero todavía no es comparable con los ratios de precisión obtenidos en predicción de valoración dado su estado incipiente.
+Resaltar que en este caso la recomendación vendría dada una vez se realiza la predicción de palabras para un usuario y un producto a través de un consiguiente análisis de dichas palabras (por ejemplo, de sentimiento). Este modelo ha sido probado en cuanto a su eficiencia en predicción\cite{emodelo} llegando tener una mejor tasa en precisión cercana al 40\%, pero todavía no es comparable con los ratios de precisión obtenidos en predicción de valoración dado su estado incipiente.
 
 \chapter{Optimización}\label{chap:opt}
 Antes de obtener unos resultados definitivos es necesario buscar los mejores parámetros de los diferentes algoritmos. No es fácil evaluar un modelo como éste, ya que no existen unos datos que usar como \textit{`\gls{groundtruth}'}.
@@ -1047,8 +1042,8 @@ En el modelo \acrshort{lsa}\index{LSA} se pueden ajustar cuatro parámetros.
 
 Los parámetros elegidos han sido maximum document frequency 200, minimum document frequency 5, número de componentes 1000 y número de features sin límite.
 
-\newlength\figureheight
-\newlength\figurewidth
+\newlength\figureheight{}
+\newlength\figurewidth{}
 \setlength\figureheight{0.49\linewidth}
 \setlength\figurewidth{\linewidth}
 \begin{figure}[!htbp]
@@ -1216,9 +1211,9 @@ Hay que tener en cuenta que las recomendaciones de un servicio como Movistar+\in
 \begin{table}
     \begin{tabularx}{\textwidth}{XXXX}
         \toprule
-        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \hiderowcolors{}LSA & Doc2Vec & Movistar+ & IMDb\\
         \midrule
-        \textbf{Star Wars IV} & \textbf{Rogue One} & Star Wars I & \textbf{Star Wars VI}\\
+        \showrowcolors{}\textbf{Star Wars IV} & \textbf{Rogue One} & Star Wars I & \textbf{Star Wars VI}\\
         Star Trek & \textbf{Star Wars IV} & \textbf{Star Wars IV} & \textbf{Star Wars IV}\\
         \textbf{Star Wars V} & \textbf{Star Wars V} & \textbf{Star Wars V} & \textbf{Star Wars V}\\
         \textbf{Star Wars VI} & \textbf{Star Wars VI} & Viaje al centro de la Tierra & Star Wars III\\
@@ -1227,7 +1222,7 @@ Hay que tener en cuenta que las recomendaciones de un servicio como Movistar+\in
         Rise of the Planet of the Apes & \textbf{Guardians of the Galaxy} & & Star Wars I\\
         Avatar & Serenity & & \textbf{Guardians of the Galaxy} \\
         Wonder Woman & Avatar & & Avengers: Age of Ultron\\
-        Star Trek II: The Wrath of Khan & The Hobbit: The Desolation of Smaug & & Deadpool\\
+        Star Trek II\: The Wrath of Khan & The Hobbit: The Desolation of Smaug & & Deadpool\\
         \bottomrule
     \end{tabularx}
     \caption{Recomendaciones para \textit{Star Wars: Episode VII – The Force Awakens}}
@@ -1237,9 +1232,9 @@ Hay que tener en cuenta que las recomendaciones de un servicio como Movistar+\in
 \begin{table}
     \begin{tabularx}{\textwidth}{XXXX}
         \toprule
-        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \hiderowcolors{}LSA & Doc2Vec & Movistar+ & IMDb\\
         \midrule
-        Strangers on a Train & \textbf{Manhattan} & The Deep Blue Sea & Vicky Cristina Barcelona\\
+        \showrowcolors{}Strangers on a Train & \textbf{Manhattan} & The Deep Blue Sea & Vicky Cristina Barcelona\\
         Hoosiers & \textbf{Midnight in Paris} & Lunas de hiel & Scoop\\
         Dial M for Murder & Hannah and Her Sisters & El ilusionista & Blue Jasmine\\
         The Royal Tenenbaums & The Grand Budapest Hotel & La mejor oferta & \textbf{Midnight in Paris}\\
@@ -1258,9 +1253,9 @@ Hay que tener en cuenta que las recomendaciones de un servicio como Movistar+\in
 \begin{table}
     \begin{tabularx}{\textwidth}{XXXX}
         \toprule
-        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \hiderowcolors{}LSA & Doc2Vec & Movistar+ & IMDb\\
         \midrule
-        \textbf{Toy Story} & \textbf{Toy Story} & \textbf{Finding Nemo} & \textbf{Toy Story 3}\\
+        \showrowcolors{}\textbf{Toy Story} & \textbf{Toy Story} & \textbf{Finding Nemo} & \textbf{Toy Story 3}\\
         \textbf{Toy Story 3} & \textbf{Toy Story 3} & Monsters, Inc. & \textbf{Toy Story}\\
         The Lego Movie & \textbf{Finding Nemo} & \textbf{Toy Story 3} & \textbf{The Incredible}\\
         \textbf{Monsters, Inc.} & \textbf{Monsters, Inc.} & Las Tortugas Ninja & Ratatouille\\
@@ -1269,7 +1264,7 @@ Hay que tener en cuenta que las recomendaciones de un servicio como Movistar+\in
         Up & \textbf{The Incredibles} & & Shrek 2\\
         Wreck-It Ralph & Despicable Me & & Finding Nemo\\
         Inside Out & The Lego Movie & & Ice Age\\
-        How to Train Your Dragon 2 & Fantastic Mr. Fox & & Kung Fu Panda\\
+        How to Train Your Dragon 2 & Fantastic Mr.\ Fox & & Kung Fu Panda\\
         \bottomrule
     \end{tabularx}
     \caption{Recomendaciones para \textit{Toy Story 2}}
@@ -1279,9 +1274,9 @@ Hay que tener en cuenta que las recomendaciones de un servicio como Movistar+\in
 \begin{table}
     \begin{tabularx}{\textwidth}{XXXX}
         \toprule
-        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \hiderowcolors{}LSA & Doc2Vec & Movistar+ & IMDb\\
         \midrule
-        \textbf{Castle in the Sky} & \textbf{The Secret World of Arrietty} & La sirenita 2 & Kiki's Delivery Service \\
+        \showrowcolors{}\textbf{Castle in the Sky} & \textbf{The Secret World of Arrietty} & La sirenita 2 & Kiki's Delivery Service \\
         Porco Rosso & My Neighbor Totoro & Toy Story 3 & \textbf{The Secret World of Arrietty}\\
         Howl's Moving Castle & \textbf{Castle in the Sky} & Finding Nemo & \textbf{Castle in the Sky}\\
         \textbf{Spirited Away} & \textbf{Spirited Away} & \textbf{The Secret World of Arrietty} & My Neighbor Totoro\\
@@ -1300,11 +1295,11 @@ Hay que tener en cuenta que las recomendaciones de un servicio como Movistar+\in
 \begin{table}
     \begin{tabularx}{\textwidth}{XXXX}
         \toprule
-        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \hiderowcolors{}LSA & Doc2Vec & Movistar+ & IMDb\\
         \midrule
-        The Wicker Man & The Haunting & Fear of the Walking Dead & 1408\\
+        \showrowcolors{}The Wicker Man & The Haunting & Fear of the Walking Dead & 1408\\
         Halloween & Repulsion & El orfanato & Dark Water\\
-        The Cabinet of Dr. Caligari & What Ever Happened to Baby Jane? & La bruja & The Ring\\
+        The Cabinet of Dr.\ Caligari & What Ever Happened to Baby Jane? & La bruja & The Ring\\
         Shutter Island & The Exorcist & Cube & The Amityville Horror\\
         Get Out & Halloween & El ilusionista & Dream House\\
         Psycho & Dogville & La mujer de negro & The Awakening\\
@@ -1321,9 +1316,9 @@ Hay que tener en cuenta que las recomendaciones de un servicio como Movistar+\in
 \begin{table}
     \begin{tabularx}{\textwidth}{XXXX}
         \toprule
-        \hiderowcolors LSA & Doc2Vec & Movistar+ & IMDb\\ \showrowcolors
+        \hiderowcolors{}LSA & Doc2Vec & Movistar+ & IMDb\\
         \midrule
-        \textbf{Iron Man} & Kick-Ass & The Flash & \textbf{Guardians of the Galaxy}\\
+        \showrowcolors{}\textbf{Iron Man} & Kick-Ass & The Flash & \textbf{Guardians of the Galaxy}\\
         Kick-Ass & Kingsman: The Secret Service & Las Tortugas Ninja & Avengers: Age of Ultron\\
         The Incredibles & \textbf{Guardians of the Galaxy} & Powers & \textbf{Captain America: Civil War}\\
         \textbf{Captain America: Civil War} & Big Hero 6 & Batman v Superman & The Avengers\\

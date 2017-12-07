@@ -30,8 +30,8 @@
     \end{tikzpicture}%
 }
 
-\newlength\figureheight
-\newlength\figurewidth
+\newlength\figureheight{}
+\newlength\figurewidth{}
 \setlength\figureheight{0.7\linewidth}
 \setlength\figurewidth{\linewidth}
 
@@ -121,22 +121,22 @@
                   vgrid,
                   time slot format=isodate-yearmonth,
                   compress calendar
-                  ]{2016-9}{2017-7}
+                  ]{2016-9}{2017-7} %chktex 8
                   \setganttlinklabel{f-s}{}
 
                   \gantttitlecalendar{year, month} \\
-                  \ganttbar{Investigación}{2016-09}{2016-11} \\
-                  \ganttbar{Doc2Vec}{2017-03}{2017-03} \\
-                  \ganttbar{LSA MVP1}{2016-10}{2016-11} \\
-                  \ganttbar{LSA MVP2}{2016-12}{2017-01} \\
-                  \ganttbar{LSA MVP3}{2017-02}{2017-03} \\
-                  \ganttbar{ALS MVP1}{2016-09}{2016-12} \\
-                  \ganttbar{ALS MVP2}{2017-01}{2017-02} \\
-                  \ganttbar{ALS MVP3}{2017-03}{2017-03} \\
-                  \ganttbar{Desarrollo Interfaz}{2017-04}{2017-05} \\
-                  \ganttmilestone{Fin Desarrollo}{2017-05} \\
-                  \ganttbar{Documentación}{2017-05}{2017-06} \\
-                  \ganttmilestone{Entrega \& Presentación}{2017-06}{2017-06}
+                  \ganttbar{Investigación}{2016-09}{2016-11} \\ %chktex 8
+                  \ganttbar{Doc2Vec}{2017-03}{2017-03} \\ %chktex 8
+                  \ganttbar{LSA MVP1}{2016-10}{2016-11} \\ %chktex 8
+                  \ganttbar{LSA MVP2}{2016-12}{2017-01} \\ %chktex 8
+                  \ganttbar{LSA MVP3}{2017-02}{2017-03} \\ %chktex 8
+                  \ganttbar{ALS MVP1}{2016-09}{2016-12} \\ %chktex 8
+                  \ganttbar{ALS MVP2}{2017-01}{2017-02} \\ %chktex 8
+                  \ganttbar{ALS MVP3}{2017-03}{2017-03} \\ %chktex 8
+                  \ganttbar{Desarrollo Interfaz}{2017-04}{2017-05} \\ %chktex 8
+                  \ganttmilestone{Fin Desarrollo}{2017-05} \\ %chktex 8
+                  \ganttbar{Documentación}{2017-05}{2017-06} \\ %chktex 8
+                  \ganttmilestone{Entrega \& Presentación}{2017-06}{2017-06} %chktex 8
 
                   \ganttlink{elem0}{elem1}
                   \ganttlink{elem0}{elem2}
@@ -364,13 +364,6 @@
       \includegraphics[scale=0.65]{./figures/skip-gram-exp.png}
   \end{frame}
 
-  %\begin{frame}{Word2Vec}
-      %Los resultados son vectores que se pueden comparar usando la similitud del coseno de cada vector.
-      %
-      %\centering
-      %\includegraphics[width=\textwidth]{./figures/res-w2v.png}
-  %\end{frame}
-
   \section{E-Modelo}
 
   \begin{frame}{E-Modelo}
@@ -426,7 +419,8 @@
       \centering
       \tiny
       \begin{tikzpicture}[baseline=-0.65ex,scale=0.8,decoration=brace]
-          \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m) {
+          \matrix [matrix of math nodes,left delimiter=(,right delimiter=),row sep=0.5cm,column sep=0.5cm] (m)
+          {
               1 & 1 & 0 & -1 & -1 & -1 & -1 & -1 & -1 \\
               0 & 1 & 0 & 0 & 2 & 0 & 0 & 1 & 0 \\
               -1 & -1 & -1 & -1 & -1 & -1 & 0 & 0 & 2 \\
