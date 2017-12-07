@@ -11,8 +11,6 @@
 %% License file: ./License
 %% Original License URL: http://www.freebsd.org/copyright/freebsd-license.html
 %%
-%% Copyright 2008-2011 Rok Strniša, Jean Martina and Matej Urbas. All rights reserved.
-%%
 %% Redistribution and use in source and binary forms, with or without modification, are
 %% permitted provided that the following conditions are met:
 %%
@@ -109,6 +107,16 @@
 \newif\ifcam@firstyr\cam@firstyrfalse
 \DeclareOption{firstyr}{\cam@firstyrtrue}
 
+% 2nd year report - omits declaration
+%
+\newif\ifcam@secondyr\cam@secondyrfalse
+\DeclareOption{secondyr}{\cam@secondyrtrue}
+
+% backrefs - add back references
+%
+\newif\ifcam@backrefs\cam@backrefsfalse
+\DeclareOption{backrefs}{\cam@backrefstrue}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
@@ -123,12 +131,21 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
+%% For consistent vertical spacing
+%%
+%%%%%
+\raggedbottom
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
 %% Additional packages, and their options.
 %%
 %%%%%
 \RequirePackage{graphicx}           % Required for the UC Logo (on the title page)
 \RequirePackage{calc}               % Used for calculating margins and laying out the title page
 \RequirePackage{setspace}      	    % Used for selecting single or onehalf line spacing.
+\RequirePackage{microtype}          % Improvement of general text appearance 
 
 % Hyperref should be included in any case, but we make it non-obtrusive (i.e.: no hyperlink borders).
 % Why do we need a separate treatment of hyperref for the techreport? Because the guidelines say so. :)
@@ -163,14 +180,13 @@
 
 % Create the glossary
 \ifcam@glossary
-
     \RequirePackage[nomain,acronym,xindy,style=long]{glossaries}
     \RequirePackage{glossaries-extra}
     \RequirePackage[spanish]{babel}
     \RequirePackage[utf8]{inputenc}
     \RequirePackage[acronym]{glossaries}
     \makeglossaries%
-    \newcommand{\printthesisglossary}{\printglossary[title={Glosario}]}
+    \newcommand{\printthesisglossary}{\printglossary[nonumberlist,title={Glosario}]}
     \newcommand{\cam@printthesisglossary}{%
         \cleardoublepage%
         \pagestyle{empty}%
@@ -321,15 +337,21 @@
 \newcommand{\@submissionnotice}{%
 \ifcam@firstyr
 First year report submitted
+\else 
+\ifcam@secondyr
+Second year report submitted
 \else
 % This dissertation is submitted
+\fi
 \fi
 \ifcam@submissiondate
     % on \@submissiondate{}
     \@submissiondate{}
-\fi
 \ifcam@firstyr
 % in partial fulfilment of the requirements
+\fi
+\ifcam@secondyr
+in partial fulfilment of the requirements
 \fi
 % for the degree of Doctor of Philosophy%
 }
@@ -397,17 +419,18 @@ First year report submitted
 \begin{lrbox}{\cam@title}
     \begin{minipage}[c][\height][c]{.98\textwidth}
         \begin{center}
-        	\begin{spacing}{2}
-            	{\Huge%
-                    \ifcam@times\else%
-                        \bfseries%
-                    \fi%
-                 {\@title{}}%
-                 \ifcam@firstyr\\%
-                 {\emph{\LARGE PhD Proposal}}%
-                 \fi}%
-        	\end{spacing}
-        \end{center}
+			\Huge%
+				\ifcam@times\else%
+				\bfseries%
+				\fi%
+			{\@title{}}%
+			\ifcam@firstyr\\%
+				{\vspace{5mm}\emph{\LARGE PhD Proposal}}%
+			\fi%
+			\ifcam@secondyr\\%
+				{\vspace{5mm}\emph{\LARGE Dissertation Schedule}}%
+			\fi
+		\end{center}
     \end{minipage}
 \end{lrbox}
 
@@ -424,7 +447,7 @@ First year report submitted
 \begin{lrbox}{\cam@authorcollege}
     \begin{minipage}[c][\height][c]{.98\textwidth}
         \begin{center}
-        {\large \@author{}}\\[1ex]
+        {\large \@author{}~\\[1ex]}
         \ifcam@collegeshield%
             \vspace{2mm}{\usebox{\cam@collegeshieldbox}}\\
         \fi
@@ -473,6 +496,7 @@ First year report submitted
 
 % Epigraph on odd page. (optional)
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%
 %% Abstract
@@ -489,51 +513,14 @@ First year report submitted
 \chapter*{Resumen}
 \thispagestyle{empty}
 \@espabstract{}
-\fi
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% Declaration
-%%
-%%%%%
-\ifcam@techreport
-% Technical report doesn't need the declaration
-% (see http://www.cl.cam.ac.uk/techreports/submission.html).
-\else
-{\ifcam@firstyr
-% First yr report doesn't need the declaration
-\else
-%\chapter*{Declaration}
-%\thispagestyle{empty}
-%This dissertation is my own work and contains nothing which is the outcome of
-%work done in collaboration with others, except where specified in the text. This
-%dissertation is not substantially the same as any that I have submitted for a
-%degree or diploma or other qualification at any other university. This
-%dissertation does not exceed the prescribed limit of 60\,000 words.
-
-% Leaving some space for the signature:
 \vspace{15mm}
 
 \begin{flushright}
 \@author{}\\
-\@fecha{}\\
+\@date{}\\
 \end{flushright}
 \vfill
-\fi}
-\fi
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
-%% Abstract
-%%
-%%%%%
-\ifcam@techreport%
-    \setcounter{page}{5}
-\fi
-
-\ifcam@firstyr
-% First yr report doesn't need a standalone abstract
-\else
 
 \chapter*{Abstract}
 \thispagestyle{empty}
@@ -550,15 +537,23 @@ First year report submitted
 % (see http://www.cl.cam.ac.uk/techreports/submission.html).
 \else
 {\ifcam@firstyr
-% First yr report doesn't need the declaration
+% First and second yr report don't need the declaration
+\else 
+\ifcam@secondyr
+%
 \else
 %\chapter*{Declaration}
 %\thispagestyle{empty}
-%This dissertation is my own work and contains nothing which is the outcome of
-%work done in collaboration with others, except where specified in the text. This
-%dissertation is not substantially the same as any that I have submitted for a
-%degree or diploma or other qualification at any other university. This
-%dissertation does not exceed the prescribed limit of 60\,000 words.
+%This dissertation is the result of my own work and includes nothing which is the outcome
+%of work done in collaboration except as declared in the Preface and specified in the text.
+%It is not substantially the same as any that I have submitted, or am concurrently
+%submitting, for a degree or diploma or other qualification at the University of Cambridge
+%or any other University or similar institution except as declared in the Preface and
+%specified in the text. I further state that no substantial part of my dissertation has
+%already been submitted, or is being concurrently submitted, for any such degree, diploma
+%or other qualification at the University of Cambridge or any other University or similar
+%institution except as declared in the Preface and specified in the text.
+%This dissertation does not exceed the prescribed limit of 60\,000 words.
 
 % Leaving some space for the signature:
 \vspace{15mm}
@@ -568,6 +563,7 @@ First year report submitted
 \@date{}\\
 \end{flushright}
 \vfill
+\fi
 \fi}
 \fi
 
@@ -579,11 +575,15 @@ First year report submitted
 %%%%%
 
 \ifcam@firstyr
-% First yr report doesn't need the declaration
+% First and second yr report don't need the acknowledgements
+\else 
+{\ifcam@secondyr
+%
 \else
 \chapter*{Agradecimientos}
 \thispagestyle{empty}
 \@acknowledgements{}
+\fi}
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -605,5 +605,24 @@ First year report submitted
 \cleardoublepage
 \pagestyle{plain}
 }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% Backrefs
+%%
+%%%%%
+
+\ifcam@backrefs
+\RequirePackage[hyperpageref]{backref}
+\renewcommand*{\backref}[1]{}
+\renewcommand*{\backrefalt}[4]{%
+	\ifcase #1 %
+	\or
+	{\footnotesize Cited on page #2.}%
+	\else
+	{\footnotesize Cited on pages #2.}%
+	\fi
+}
+\fi
 
 %%%%% EOF: cam-thesis.cls
