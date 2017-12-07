@@ -3,7 +3,7 @@ osx_image: xcode9
 language: cpp
 before_install:
   - brew update
-  - brew tap caskroom/fonts 
+  - brew tap caskroom/fonts
   - brew cask install basictex font-fira-mono font-fira-sans
   - export PATH=$PATH:/Library/TeX/texbin/
   - sudo tlmgr update --self
@@ -11,7 +11,6 @@ before_install:
   - sudo pip2 install pygments
 script:
   - make all
+  - lacheck *.tex
   - chktex -q *.tex 2>/dev/null | tee lint.out
-  - test ! -s lint.out
-  - lacheck *.tex 2>/dev/null | tee lint.out
   - test ! -s lint.out
