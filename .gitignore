@@ -32,4 +32,7 @@ _minted-thesis
 *.nav
 *.snm
 *.glsdefs
+*.bcf
+*.lof
+*.lot
 _minted-*
