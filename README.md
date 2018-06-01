@@ -1,6 +1,6 @@
 # Movie Pepper Doc
 
-[![Build Status](https://travis-ci.org/hugo19941994/movie-pepper-doc.svg?branch=master)](https://travis-ci.org/hugo19941994/movie-pepper-doc)
+[![Build Status](https://travis-ci.com/hugo19941994/movie-pepper-doc.svg?branch=master)](https://travis-ci.com/hugo19941994/movie-pepper-doc)
 
 This repo contains documentation about the Movie Pepper Project.
 
